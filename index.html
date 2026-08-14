@@ -1,0 +1,2857 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Fleet Command — Личный состав</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+:root{
+  --bg:#080d13;
+  --panel:#111923;
+  --panel2:#17212d;
+  --line:#283646;
+  --text:#eef4fb;
+  --muted:#91a0b2;
+  --accent:#4d9cff;
+  --accent2:#2b75cf;
+  --danger:#ff6478;
+  --ok:#48d597;
+  --gold:#e8c56a;
+}
+
+*{
+  box-sizing:border-box;
+}
+
+html,
+body{
+  margin:0;
+  min-height:100%;
+}
+
+body{
+  font-family:
+    Inter,
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+
+  background:
+    radial-gradient(
+      circle at 50% -10%,
+      #1a3049 0,
+      #0b1119 42%,
+      #070b10 100%
+    );
+
+  color:var(--text);
+}
+
+button,
+input,
+select,
+textarea{
+  font:inherit;
+}
+
+button{
+  cursor:pointer;
+}
+
+.hidden{
+  display:none !important;
+}
+
+.container{
+  max-width:1300px;
+  margin:0 auto;
+  padding:24px;
+}
+
+.top{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:16px;
+  margin-bottom:22px;
+}
+
+.brand{
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
+
+.crest{
+  width:48px;
+  height:48px;
+  border-radius:13px;
+
+  display:grid;
+  place-items:center;
+
+  background:
+    linear-gradient(
+      145deg,
+      #17283c,
+      #0e1722
+    );
+
+  border:1px solid #38506a;
+
+  box-shadow:
+    0 8px 30px #0005;
+
+  font-size:23px;
+}
+
+.card{
+  background:
+    linear-gradient(
+      180deg,
+      rgba(20,30,42,.96),
+      rgba(12,19,28,.96)
+    );
+
+  border:1px solid var(--line);
+
+  border-radius:17px;
+
+  padding:18px;
+
+  box-shadow:
+    0 20px 60px rgba(0,0,0,.28);
+}
+
+.grid{
+  display:grid;
+  grid-template-columns:repeat(12,1fr);
+  gap:16px;
+}
+
+.span12{
+  grid-column:span 12;
+}
+
+.span8{
+  grid-column:span 8;
+}
+
+.span4{
+  grid-column:span 4;
+}
+
+.muted{
+  color:var(--muted);
+}
+
+.small{
+  font-size:12px;
+}
+
+.pill{
+  display:inline-flex;
+  align-items:center;
+
+  padding:7px 11px;
+
+  border-radius:999px;
+
+  background:#101923;
+  border:1px solid #304153;
+
+  font-size:12px;
+}
+
+.tabs{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+
+  margin-bottom:16px;
+}
+
+.tab{
+  transition:.15s;
+}
+
+.tab:hover{
+  border-color:#4c6480;
+}
+
+.tab.active{
+  background:#20344c;
+  border-color:#4a79a9;
+}
+
+button{
+  padding:10px 14px;
+
+  border-radius:10px;
+
+  color:var(--text);
+
+  background:#182331;
+
+  border:1px solid #34475b;
+
+  transition:
+    background .15s,
+    border-color .15s,
+    transform .1s;
+}
+
+button:hover{
+  background:#213043;
+  border-color:#4a6078;
+}
+
+button:active{
+  transform:translateY(1px);
+}
+
+button.primary{
+  background:var(--accent2);
+  border-color:#428be0;
+}
+
+button.primary:hover{
+  background:#3382dc;
+}
+
+button.danger{
+  background:#351821;
+  border-color:#713444;
+  color:#ffb4bf;
+}
+
+button.ghost{
+  background:transparent;
+}
+
+label{
+  display:block;
+
+  margin-bottom:7px;
+
+  color:#b8c4d2;
+
+  font-size:13px;
+}
+
+input,
+select,
+textarea{
+  width:100%;
+
+  padding:11px 12px;
+
+  color:var(--text);
+
+  background:#0b121a;
+
+  border:1px solid #2b3a4b;
+
+  border-radius:10px;
+
+  outline:none;
+}
+
+input:focus,
+select:focus,
+textarea:focus{
+  border-color:var(--accent);
+
+  box-shadow:
+    0 0 0 3px rgba(77,156,255,.12);
+}
+
+textarea{
+  resize:vertical;
+}
+
+.formgrid{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:12px;
+}
+
+.full{
+  grid-column:1/-1;
+}
+
+.actions{
+  display:flex;
+  flex-wrap:wrap;
+  gap:9px;
+
+  margin-top:14px;
+}
+
+table{
+  width:100%;
+  border-collapse:collapse;
+}
+
+th,
+td{
+  text-align:left;
+
+  padding:12px 10px;
+
+  border-bottom:1px solid #253240;
+
+  vertical-align:middle;
+}
+
+th{
+  color:#91a0b2;
+
+  font-size:11px;
+
+  text-transform:uppercase;
+
+  letter-spacing:.05em;
+}
+
+.rank{
+  font-weight:700;
+}
+
+.r100{
+  color:#f0d16d;
+}
+
+.r90{
+  color:#d7e6ff;
+}
+
+.r80{
+  color:#b9d5ff;
+}
+
+.r70{
+  color:#9fbeef;
+}
+
+.r10{
+  color:#d6dde7;
+}
+
+.statgrid{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:12px;
+}
+
+.stat{
+  padding:15px;
+
+  border-radius:13px;
+
+  background:#0c141d;
+
+  border:1px solid #253342;
+}
+
+.num{
+  margin-top:3px;
+
+  font-size:27px;
+
+  font-weight:800;
+}
+
+.login{
+  min-height:100vh;
+
+  display:grid;
+
+  place-items:center;
+
+  padding:20px;
+}
+
+.loginbox{
+  width:min(440px,100%);
+}
+
+.login-title{
+  margin-bottom:3px;
+}
+
+.error{
+  margin-top:10px;
+
+  padding:10px 12px;
+
+  border-radius:10px;
+
+  background:#351821;
+
+  border:1px solid #63303b;
+
+  color:#ffabb7;
+}
+
+.success{
+  margin-top:10px;
+
+  padding:10px 12px;
+
+  border-radius:10px;
+
+  background:#123126;
+
+  border:1px solid #245e49;
+
+  color:#9af0c9;
+}
+
+.medal{
+  padding:13px;
+
+  margin-bottom:10px;
+
+  border-radius:12px;
+
+  background:#101922;
+
+  border:1px solid #344353;
+}
+
+.medal strong{
+  color:var(--gold);
+}
+
+.empty{
+  padding:25px;
+
+  text-align:center;
+
+  color:var(--muted);
+}
+
+.loading{
+  text-align:center;
+
+  padding:30px;
+
+  color:var(--muted);
+}
+
+.status{
+  min-height:18px;
+}
+
+@media(max-width:850px){
+
+  .span8,
+  .span4{
+    grid-column:span 12;
+  }
+
+  .statgrid{
+    grid-template-columns:repeat(2,1fr);
+  }
+
+  .container{
+    padding:14px;
+  }
+
+}
+
+@media(max-width:600px){
+
+  .top{
+    align-items:flex-start;
+    flex-direction:column;
+  }
+
+  .formgrid{
+    grid-template-columns:1fr;
+  }
+
+  .statgrid{
+    grid-template-columns:1fr 1fr;
+  }
+
+  table{
+    min-width:720px;
+  }
+
+}
+</style>
+</head>
+
+<body>
+
+<!-- =====================================================
+     LOGIN
+===================================================== -->
+
+<div id="loginView" class="login">
+
+  <div class="card loginbox">
+
+    <div class="brand">
+
+      <div class="crest">
+        ⚓
+      </div>
+
+      <div>
+
+        <h1 class="login-title">
+          Fleet Command
+        </h1>
+
+        <div class="muted">
+          Система личного состава
+        </div>
+
+      </div>
+
+    </div>
+
+    <div style="height:20px"></div>
+
+    <label for="loginUser">
+      Имя пользователя
+    </label>
+
+    <input
+      id="loginUser"
+      autocomplete="username"
+      placeholder="admin"
+    >
+
+    <div style="height:11px"></div>
+
+    <label for="loginPass">
+      Пароль
+    </label>
+
+    <input
+      id="loginPass"
+      type="password"
+      autocomplete="current-password"
+      placeholder="••••••••"
+    >
+
+    <div
+      id="loginMsg"
+      class="status"
+    ></div>
+
+    <div class="actions">
+
+      <button
+        id="loginBtn"
+        class="primary"
+        type="button"
+      >
+        Войти
+      </button>
+
+    </div>
+
+    <div
+      class="muted small"
+      style="margin-top:12px"
+    >
+      Пользователи создаются только через админ-панель.
+    </div>
+
+  </div>
+
+</div>
+
+
+<!-- =====================================================
+     APPLICATION
+===================================================== -->
+
+<div
+  id="app"
+  class="hidden"
+>
+
+  <div class="container">
+
+    <header class="top">
+
+      <div class="brand">
+
+        <div class="crest">
+          ⚓
+        </div>
+
+        <div>
+
+          <h2 style="margin:0 0 3px">
+            Fleet Command
+          </h2>
+
+          <div class="muted">
+            Личный состав и награды
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <div
+        style="
+          display:flex;
+          gap:9px;
+          align-items:center;
+          flex-wrap:wrap;
+        "
+      >
+
+        <span
+          id="meBadge"
+          class="pill"
+        ></span>
+
+        <button
+          id="logoutBtn"
+          class="ghost"
+          type="button"
+        >
+          Выйти
+        </button>
+
+      </div>
+
+    </header>
+
+
+    <!-- TABS -->
+
+    <div class="tabs">
+
+      <button
+        class="tab active"
+        data-tab="personnel"
+        type="button"
+      >
+        Личный состав
+      </button>
+
+      <button
+        class="tab"
+        data-tab="medals"
+        type="button"
+      >
+        Медали
+      </button>
+
+      <button
+        class="tab adminOnly"
+        data-tab="accounts"
+        type="button"
+      >
+        Управление аккаунтами
+      </button>
+
+    </div>
+
+
+    <!-- =================================================
+         PERSONNEL
+    ================================================== -->
+
+    <section
+      id="personnel"
+      class="tabpane"
+    >
+
+      <div class="grid">
+
+        <div class="card span12">
+
+          <div class="statgrid">
+
+            <div class="stat">
+
+              <div class="muted small">
+                Всего
+              </div>
+
+              <div
+                id="statTotal"
+                class="num"
+              >
+                0
+              </div>
+
+            </div>
+
+
+            <div class="stat">
+
+              <div class="muted small">
+                Старший состав
+              </div>
+
+              <div
+                id="statCommand"
+                class="num"
+              >
+                0
+              </div>
+
+            </div>
+
+
+            <div class="stat">
+
+              <div class="muted small">
+                Медалей
+              </div>
+
+              <div
+                id="statMedals"
+                class="num"
+              >
+                0
+              </div>
+
+            </div>
+
+
+            <div class="stat">
+
+              <div class="muted small">
+                Ваш уровень
+              </div>
+
+              <div
+                id="statRank"
+                class="num"
+              >
+                0
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <div class="card span12">
+
+          <div
+            style="
+              display:flex;
+              justify-content:space-between;
+              align-items:center;
+              gap:15px;
+              flex-wrap:wrap;
+              margin-bottom:14px;
+            "
+          >
+
+            <div>
+
+              <h3 style="margin-bottom:4px">
+                Личный состав
+              </h3>
+
+              <div class="muted small">
+                Пароли никогда не отображаются.
+              </div>
+
+            </div>
+
+
+            <input
+              id="personnelSearch"
+              style="max-width:310px"
+              placeholder="Поиск..."
+            >
+
+          </div>
+
+
+          <div style="overflow:auto">
+
+            <table>
+
+              <thead>
+
+                <tr>
+
+                  <th>№</th>
+
+                  <th>Пользователь</th>
+
+                  <th>Позывной</th>
+
+                  <th>Звание</th>
+
+                  <th>Медали</th>
+
+                  <th>Действия</th>
+
+                </tr>
+
+              </thead>
+
+              <tbody
+                id="personnelBody"
+              ></tbody>
+
+            </table>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- =================================================
+         MEDALS
+    ================================================== -->
+
+    <section
+      id="medals"
+      class="tabpane hidden"
+    >
+
+      <div class="grid">
+
+        <div class="card span8">
+
+          <h3>
+            Выданные награды
+          </h3>
+
+          <div
+            id="medalList"
+          ></div>
+
+        </div>
+
+
+        <div
+          id="awardBox"
+          class="card span4"
+        >
+
+          <h3>
+            Выдать медаль
+          </h3>
+
+          <label>
+            Военнослужащий
+          </label>
+
+          <select
+            id="awardUser"
+          ></select>
+
+          <div style="height:11px"></div>
+
+          <label>
+            Название медали
+          </label>
+
+          <input
+            id="awardName"
+            maxlength="100"
+            placeholder="Например: За заслуги"
+          >
+
+          <div style="height:11px"></div>
+
+          <label>
+            Основание / заслуга
+          </label>
+
+          <textarea
+            id="awardReason"
+            maxlength="1000"
+            rows="5"
+            placeholder="За что выдана награда"
+          ></textarea>
+
+          <div
+            id="awardMsg"
+            class="status"
+          ></div>
+
+          <div class="actions">
+
+            <button
+              id="awardBtn"
+              class="primary"
+              type="button"
+            >
+              Выдать
+            </button>
+
+          </div>
+
+          <div
+            class="muted small"
+            style="margin-top:10px"
+          >
+            Награды могут выдавать Адмирал флота,
+            Адмирал, Вице-Адмирал и Контр-Адмирал.
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- =================================================
+         ACCOUNT MANAGEMENT
+    ================================================== -->
+
+    <section
+      id="accounts"
+      class="tabpane hidden"
+    >
+
+      <div class="grid">
+
+        <div class="card span4">
+
+          <h3>
+            Создать аккаунт
+          </h3>
+
+          <div class="formgrid">
+
+            <div class="full">
+
+              <label>
+                Номер
+              </label>
+
+              <input
+                id="newNumber"
+                maxlength="30"
+                placeholder="001"
+              >
+
+            </div>
+
+
+            <div class="full">
+
+              <label>
+                Имя пользователя
+              </label>
+
+              <input
+                id="newUsername"
+                maxlength="32"
+                autocomplete="off"
+                placeholder="sailor1"
+              >
+
+            </div>
+
+
+            <div class="full">
+
+              <label>
+                Позывной
+              </label>
+
+              <input
+                id="newCallsign"
+                maxlength="50"
+                placeholder="ВОЛК"
+              >
+
+            </div>
+
+
+            <div class="full">
+
+              <label>
+                Пароль
+              </label>
+
+              <input
+                id="newPassword"
+                type="password"
+                minlength="8"
+                autocomplete="new-password"
+                placeholder="Минимум 8 символов"
+              >
+
+            </div>
+
+
+            <div class="full">
+
+              <label>
+                Звание
+              </label>
+
+              <select
+                id="newRank"
+              ></select>
+
+            </div>
+
+          </div>
+
+
+          <div
+            id="createMsg"
+            class="status"
+          ></div>
+
+
+          <div class="actions">
+
+            <button
+              id="createBtn"
+              class="primary"
+              type="button"
+            >
+              Создать аккаунт
+            </button>
+
+          </div>
+
+
+          <div
+            class="muted small"
+            style="margin-top:10px"
+          >
+            Можно создать только звание ниже собственного уровня.
+          </div>
+
+        </div>
+
+
+        <div class="card span8">
+
+          <h3>
+            Управление аккаунтами
+          </h3>
+
+          <div
+            class="muted small"
+            style="margin-bottom:13px"
+          >
+            Удалять можно только аккаунты ниже собственного ранга.
+            Себя удалить нельзя.
+          </div>
+
+
+          <div style="overflow:auto">
+
+            <table>
+
+              <thead>
+
+                <tr>
+
+                  <th>№</th>
+
+                  <th>Пользователь</th>
+
+                  <th>Звание</th>
+
+                  <th></th>
+
+                </tr>
+
+              </thead>
+
+              <tbody
+                id="accountBody"
+              ></tbody>
+
+            </table>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+  </div>
+
+</div>
+
+
+<script>
+
+/* =====================================================
+   SUPABASE CONFIGURATION
+
+   ВСТАВЬ СЮДА СВОИ ДАННЫЕ
+===================================================== */
+
+const SUPABASE_URL =
+  "https://mthicokgzlifzvxgjulc.supabase.co";
+
+const SUPABASE_PUBLISHABLE_KEY =
+  "sb_publishable_1v7XKkctZSbwGss0ULXoZQ_2tYdrMHx";
+
+
+const {
+  createClient
+} = window.supabase;
+
+
+const db =
+  createClient(
+    SUPABASE_URL,
+    SUPABASE_PUBLISHABLE_KEY
+  );
+
+
+/* =====================================================
+   RANKS
+===================================================== */
+
+const RANKS = [
+
+  {
+    name:"Адмирал флота",
+    level:100
+  },
+
+  {
+    name:"Адмирал",
+    level:90
+  },
+
+  {
+    name:"Вице-Адмирал",
+    level:80
+  },
+
+  {
+    name:"Контр-Адмирал",
+    level:70
+  },
+
+  {
+    name:"Пользователь",
+    level:10
+  }
+
+];
+
+
+const COMMAND_LEVEL = 70;
+
+
+let me = null;
+
+let profiles = [];
+
+let medals = [];
+
+
+/* =====================================================
+   HELPERS
+===================================================== */
+
+function $(id){
+
+  return document.getElementById(id);
+
+}
+
+
+function esc(value){
+
+  return String(value ?? "")
+    .replace(
+      /[&<>"']/g,
+      char => ({
+
+        "&":"&amp;",
+        "<":"&lt;",
+        ">":"&gt;",
+        '"':"&quot;",
+        "'":"&#039;"
+
+      }[char])
+    );
+
+}
+
+
+function showMessage(
+  elementId,
+  text,
+  success = false
+){
+
+  const el =
+    $(elementId);
+
+  if(!el){
+    return;
+  }
+
+  if(!text){
+
+    el.innerHTML = "";
+
+    return;
+
+  }
+
+  el.innerHTML =
+    `<div class="${success ? "success" : "error"}">
+      ${esc(text)}
+    </div>`;
+
+}
+
+
+function command(){
+
+  return Boolean(
+    me &&
+    me.level >= COMMAND_LEVEL
+  );
+
+}
+
+
+function canManage(profile){
+
+  return Boolean(
+
+    me &&
+    profile &&
+
+    profile.id !== me.id &&
+
+    profile.level < me.level
+
+  );
+
+}
+
+
+/* =====================================================
+   VIEW SWITCHING
+===================================================== */
+
+function showLogin(){
+
+  $("app")
+    .classList
+    .add("hidden");
+
+  $("loginView")
+    .classList
+    .remove("hidden");
+
+}
+
+
+function showApp(){
+
+  /*
+    ЭТО ВАЖНО.
+
+    После успешного входа
+    именно здесь форма логина
+    исчезает, а приложение появляется.
+  */
+
+  $("loginView")
+    .classList
+    .add("hidden");
+
+  $("app")
+    .classList
+    .remove("hidden");
+
+}
+
+
+/* =====================================================
+   LOGIN
+===================================================== */
+
+async function login(){
+
+  const username =
+    $("loginUser")
+      .value
+      .trim()
+      .toLowerCase();
+
+  const password =
+    $("loginPass")
+      .value;
+
+
+  showMessage(
+    "loginMsg",
+    ""
+  );
+
+
+  if(
+    !username ||
+    !password
+  ){
+
+    showMessage(
+      "loginMsg",
+      "Введите имя пользователя и пароль."
+    );
+
+    return;
+
+  }
+
+
+  /*
+    В базе Auth используется
+    технический email:
+
+    admin
+    ↓
+    admin@fleet.local
+  */
+
+  const email =
+    `${username}@fleet.local`;
+
+
+  const {
+    data,
+    error
+  } =
+  await db.auth.signInWithPassword({
+
+    email,
+
+    password
+
+  });
+
+
+  if(error){
+
+    console.error(
+      "Ошибка авторизации:",
+      error
+    );
+
+    showMessage(
+      "loginMsg",
+      error.message ||
+      "Не удалось выполнить вход."
+    );
+
+    return;
+
+  }
+
+
+  console.log(
+    "Auth OK:",
+    data.user
+  );
+
+
+  /*
+    ВАЖНО:
+
+    После Auth мы отдельно
+    загружаем profile.
+  */
+
+  await load();
+
+}
+
+
+/* =====================================================
+   LOAD CURRENT USER
+===================================================== */
+
+async function load(){
+
+  const {
+    data:{
+      user
+    },
+    error:userError
+  } =
+  await db.auth.getUser();
+
+
+  console.log(
+    "Current Auth user:",
+    user
+  );
+
+
+  if(
+    userError ||
+    !user
+  ){
+
+    me = null;
+
+    showLogin();
+
+    return;
+
+  }
+
+
+  /*
+    maybeSingle() вместо single().
+
+    Если профиля нет,
+    не получаем 406.
+  */
+
+  const {
+    data:p,
+    error:profileError
+  } =
+  await db
+    .from("profiles")
+    .select("*")
+    .eq("id",user.id)
+    .maybeSingle();
+
+
+  console.log(
+    "Current profile:",
+    p
+  );
+
+
+  if(profileError){
+
+    console.error(
+      "Ошибка загрузки профиля:",
+      profileError
+    );
+
+    showMessage(
+      "loginMsg",
+      "Ошибка загрузки профиля: " +
+      profileError.message
+    );
+
+    await db.auth.signOut();
+
+    showLogin();
+
+    return;
+
+  }
+
+
+  if(!p){
+
+    showMessage(
+      "loginMsg",
+      "Для этого аккаунта нет профиля в таблице profiles."
+    );
+
+    await db.auth.signOut();
+
+    showLogin();
+
+    return;
+
+  }
+
+
+  /*
+    Профиль найден.
+  */
+
+  me = p;
+
+
+  /*
+    КЛЮЧЕВОЕ ИСПРАВЛЕНИЕ:
+
+    Показываем приложение
+    после успешной загрузки
+    профиля.
+  */
+
+  showApp();
+
+
+  $("meBadge").textContent =
+    `${p.username} · ${p.rank_name}`;
+
+
+  $("statRank").textContent =
+    p.level;
+
+
+  /*
+    Показываем вкладку
+    управления аккаунтами
+    только командному составу.
+  */
+
+  document
+    .querySelectorAll(".adminOnly")
+    .forEach(
+      element => {
+
+        element.classList.toggle(
+          "hidden",
+          !command()
+        );
+
+      }
+    );
+
+
+  /*
+    Форма выдачи медалей.
+  */
+
+  $("awardBox").style.display =
+    command()
+      ? "block"
+      : "none";
+
+
+  /*
+    Загружаем данные.
+  */
+
+  await refresh();
+
+}
+
+
+/* =====================================================
+   REFRESH DATABASE DATA
+===================================================== */
+
+async function refresh(){
+
+  const [
+
+    profilesResult,
+
+    medalsResult
+
+  ] =
+  await Promise.all([
+
+    db
+      .from("profiles")
+      .select("*")
+      .order(
+        "level",
+        {
+          ascending:false
+        }
+      )
+      .order(
+        "number",
+        {
+          ascending:true
+        }
+      ),
+
+    db
+      .from("medals")
+      .select(
+        `
+          *,
+          profiles!medals_user_id_fkey(
+            username,
+            rank_name
+          )
+        `
+      )
+      .order(
+        "created_at",
+        {
+          ascending:false
+        }
+      )
+
+  ]);
+
+
+  if(
+    profilesResult.error
+  ){
+
+    console.error(
+      "Ошибка profiles:",
+      profilesResult.error
+    );
+
+    return;
+
+  }
+
+
+  if(
+    medalsResult.error
+  ){
+
+    console.error(
+      "Ошибка medals:",
+      medalsResult.error
+    );
+
+    /*
+      Если таблица medals ещё не настроена,
+      не ломаем весь интерфейс.
+    */
+
+    medals = [];
+
+  }
+
+  else{
+
+    medals =
+      medalsResult.data || [];
+
+  }
+
+
+  profiles =
+    profilesResult.data || [];
+
+
+  renderPersonnel();
+
+  renderMedals();
+
+  renderAccounts();
+
+  renderRankOptions();
+
+}
+
+
+/* =====================================================
+   PERSONNEL
+===================================================== */
+
+function renderPersonnel(){
+
+  const search =
+    $("personnelSearch")
+      .value
+      .trim()
+      .toLowerCase();
+
+
+  const rows =
+    profiles.filter(
+      profile => {
+
+        const text = [
+
+          profile.number,
+
+          profile.username,
+
+          profile.callsign,
+
+          profile.rank_name
+
+        ]
+        .join(" ")
+        .toLowerCase();
+
+
+        return text.includes(search);
+
+      }
+    );
+
+
+  $("personnelBody").innerHTML =
+
+    rows.map(
+      profile => {
+
+        const medalCount =
+          medals.filter(
+            medal =>
+              medal.user_id === profile.id
+          ).length;
+
+
+        return `
+
+<tr>
+
+<td>
+  ${esc(profile.number)}
+</td>
+
+<td>
+  <strong>
+    ${esc(profile.username)}
+  </strong>
+</td>
+
+<td>
+  ${esc(profile.callsign)}
+</td>
+
+<td class="rank r${profile.level}">
+  ${esc(profile.rank_name)}
+</td>
+
+<td>
+  ${medalCount}
+</td>
+
+<td>
+
+${
+  command() &&
+  profile.id !== me.id &&
+  profile.level < me.level
+
+  ?
+
+  `<button
+      type="button"
+      class="ghost"
+      onclick="openAward('${esc(profile.id)}')"
+   >
+      Наградить
+   </button>`
+
+  :
+
+  ""
+
+}
+
+</td>
+
+</tr>
+
+`;
+
+      }
+    ).join("")
+
+    ||
+
+    `
+
+<tr>
+
+<td
+  colspan="6"
+  class="empty"
+>
+  Личный состав не найден.
+</td>
+
+</tr>
+
+`;
+
+
+  $("statTotal").textContent =
+    profiles.length;
+
+
+  $("statCommand").textContent =
+    profiles.filter(
+      profile =>
+        profile.level >= COMMAND_LEVEL
+    ).length;
+
+
+  $("statMedals").textContent =
+    medals.length;
+
+}
+
+
+/* =====================================================
+   MEDALS
+===================================================== */
+
+function renderMedals(){
+
+  const list =
+    $("medalList");
+
+
+  if(!medals.length){
+
+    list.innerHTML =
+      `
+      <div class="empty">
+        Наград пока нет.
+      </div>
+      `;
+
+  }
+
+  else{
+
+    list.innerHTML =
+
+      medals.map(
+        medal => `
+
+<div class="medal">
+
+  <strong>
+    🏅 ${esc(medal.medal_name)}
+  </strong>
+
+  <div style="margin-top:5px">
+
+    ${esc(
+      medal.profiles?.username ||
+      "Неизвестный пользователь"
+    )}
+
+    <span class="muted">
+      ·
+    </span>
+
+    ${esc(
+      medal.profiles?.rank_name ||
+      ""
+    )}
+
+  </div>
+
+  <div
+    class="muted"
+    style="margin-top:6px"
+  >
+    ${esc(medal.reason)}
+  </div>
+
+  <div
+    class="muted small"
+    style="margin-top:8px"
+  >
+    ${new Date(
+      medal.created_at
+    ).toLocaleString("ru-RU")}
+  </div>
+
+</div>
+
+`
+      ).join("");
+
+  }
+
+
+  /*
+    Формируем список тех,
+    кого текущий командир
+    может наградить.
+  */
+
+  if(!command()){
+
+    $("awardUser").innerHTML =
+      "";
+
+    return;
+
+  }
+
+
+  const eligible =
+    profiles.filter(
+      profile =>
+        profile.id !== me.id &&
+        profile.level < me.level
+    );
+
+
+  $("awardUser").innerHTML =
+
+    eligible.map(
+      profile => `
+
+<option value="${esc(profile.id)}">
+
+  ${esc(profile.number)}
+  —
+  ${esc(profile.username)}
+  —
+  ${esc(profile.rank_name)}
+
+</option>
+
+`
+    ).join("");
+
+
+  if(!eligible.length){
+
+    $("awardUser").innerHTML =
+      `<option value="">
+        Нет доступных пользователей
+      </option>`;
+
+  }
+
+}
+
+
+/* =====================================================
+   ACCOUNT MANAGEMENT
+===================================================== */
+
+function renderAccounts(){
+
+  const body =
+    $("accountBody");
+
+
+  if(!command()){
+
+    body.innerHTML =
+      `
+      <tr>
+        <td
+          colspan="4"
+          class="empty"
+        >
+          Недостаточно прав.
+        </td>
+      </tr>
+      `;
+
+    return;
+
+  }
+
+
+  const manageable =
+    profiles.filter(
+      profile =>
+        canManage(profile)
+    );
+
+
+  if(!manageable.length){
+
+    body.innerHTML =
+      `
+      <tr>
+        <td
+          colspan="4"
+          class="empty"
+        >
+          Нет аккаунтов, которыми можно управлять.
+        </td>
+      </tr>
+      `;
+
+    return;
+
+  }
+
+
+  body.innerHTML =
+
+    manageable.map(
+      profile => `
+
+<tr>
+
+<td>
+  ${esc(profile.number)}
+</td>
+
+<td>
+
+  <strong>
+    ${esc(profile.username)}
+  </strong>
+
+  <br>
+
+  <span class="muted small">
+    ${esc(profile.callsign)}
+  </span>
+
+</td>
+
+<td class="rank r${profile.level}">
+  ${esc(profile.rank_name)}
+</td>
+
+<td>
+
+  <button
+    type="button"
+    class="danger"
+    onclick="removeAccount('${esc(profile.id)}')"
+  >
+    Удалить
+  </button>
+
+</td>
+
+</tr>
+
+`
+    ).join("");
+
+}
+
+
+/* =====================================================
+   RANK OPTIONS
+===================================================== */
+
+function renderRankOptions(){
+
+  const select =
+    $("newRank");
+
+
+  if(!command()){
+
+    select.innerHTML =
+      "";
+
+    return;
+
+  }
+
+
+  const available =
+    RANKS.filter(
+      rank =>
+        rank.level < me.level
+    );
+
+
+  select.innerHTML =
+
+    available.map(
+      rank => `
+
+<option value="${esc(rank.name)}">
+
+  ${esc(rank.name)}
+  —
+  уровень ${rank.level}
+
+</option>
+
+`
+    ).join("");
+
+
+  if(!available.length){
+
+    select.innerHTML =
+      `<option value="">
+        Нет доступных званий
+      </option>`;
+
+  }
+
+}
+
+
+/* =====================================================
+   CREATE ACCOUNT
+===================================================== */
+
+async function createAccount(){
+
+  if(!command()){
+
+    showMessage(
+      "createMsg",
+      "Недостаточно прав."
+    );
+
+    return;
+
+  }
+
+
+  const payload = {
+
+    number:
+      $("newNumber")
+        .value
+        .trim(),
+
+    username:
+      $("newUsername")
+        .value
+        .trim()
+        .toLowerCase(),
+
+    callsign:
+      $("newCallsign")
+        .value
+        .trim(),
+
+    password:
+      $("newPassword")
+        .value,
+
+    rank_name:
+      $("newRank")
+        .value
+
+  };
+
+
+  if(
+    !payload.number ||
+    !payload.username ||
+    !payload.callsign
+  ){
+
+    showMessage(
+      "createMsg",
+      "Заполните все поля."
+    );
+
+    return;
+
+  }
+
+
+  if(
+    payload.password.length < 8
+  ){
+
+    showMessage(
+      "createMsg",
+      "Пароль должен содержать минимум 8 символов."
+    );
+
+    return;
+
+  }
+
+
+  if(!payload.rank_name){
+
+    showMessage(
+      "createMsg",
+      "Выберите звание."
+    );
+
+    return;
+
+  }
+
+
+  showMessage(
+    "createMsg",
+    "Создание аккаунта..."
+  );
+
+
+  try{
+
+    const {
+      data,
+      error
+    } =
+    await db.functions.invoke(
+      "admin-users",
+      {
+        body:{
+          action:"create",
+
+          number:
+            payload.number,
+
+          username:
+            payload.username,
+
+          callsign:
+            payload.callsign,
+
+          password:
+            payload.password,
+
+          rank_name:
+            payload.rank_name
+        }
+      }
+    );
+
+
+    if(error){
+
+      console.error(
+        "Edge Function error:",
+        error
+      );
+
+      showMessage(
+        "createMsg",
+        error.message ||
+        "Ошибка Edge Function."
+      );
+
+      return;
+
+    }
+
+
+    if(
+      !data ||
+      !data.ok
+    ){
+
+      showMessage(
+        "createMsg",
+        data?.error ||
+        "Не удалось создать аккаунт."
+      );
+
+      return;
+
+    }
+
+
+    showMessage(
+      "createMsg",
+      "Аккаунт успешно создан.",
+      true
+    );
+
+
+    $("newNumber").value = "";
+
+    $("newUsername").value = "";
+
+    $("newCallsign").value = "";
+
+    $("newPassword").value = "";
+
+
+    await refresh();
+
+  }
+
+  catch(error){
+
+    console.error(
+      error
+    );
+
+    showMessage(
+      "createMsg",
+      error.message ||
+      "Неизвестная ошибка."
+    );
+
+  }
+
+}
+
+
+/* =====================================================
+   DELETE ACCOUNT
+===================================================== */
+
+async function removeAccount(
+  id
+){
+
+  const profile =
+    profiles.find(
+      item =>
+        item.id === id
+    );
+
+
+  if(!profile){
+
+    alert(
+      "Пользователь не найден."
+    );
+
+    return;
+
+  }
+
+
+  if(
+    !canManage(profile)
+  ){
+
+    alert(
+      "Недостаточно прав."
+    );
+
+    return;
+
+  }
+
+
+  const confirmed =
+    confirm(
+      `Удалить аккаунт "${profile.username}"?\n\n` +
+      `Звание: ${profile.rank_name}\n` +
+      `Номер: ${profile.number}\n\n` +
+      `Это действие нельзя отменить.`
+    );
+
+
+  if(!confirmed){
+
+    return;
+
+  }
+
+
+  try{
+
+    const {
+      data,
+      error
+    } =
+    await db.functions.invoke(
+      "admin-users",
+      {
+        body:{
+          action:"delete",
+          user_id:id
+        }
+      }
+    );
+
+
+    if(error){
+
+      console.error(
+        error
+      );
+
+      alert(
+        error.message ||
+        "Ошибка удаления."
+      );
+
+      return;
+
+    }
+
+
+    if(
+      !data ||
+      !data.ok
+    ){
+
+      alert(
+        data?.error ||
+        "Не удалось удалить пользователя."
+      );
+
+      return;
+
+    }
+
+
+    await refresh();
+
+  }
+
+  catch(error){
+
+    console.error(
+      error
+    );
+
+    alert(
+      error.message ||
+      "Неизвестная ошибка."
+    );
+
+  }
+
+}
+
+
+/* =====================================================
+   AWARD MEDAL
+===================================================== */
+
+async function award(){
+
+  if(!command()){
+
+    showMessage(
+      "awardMsg",
+      "Недостаточно прав."
+    );
+
+    return;
+
+  }
+
+
+  const user_id =
+    $("awardUser").value;
+
+
+  const medal_name =
+    $("awardName")
+      .value
+      .trim();
+
+
+  const reason =
+    $("awardReason")
+      .value
+      .trim();
+
+
+  if(
+    !user_id ||
+    !medal_name ||
+    !reason
+  ){
+
+    showMessage(
+      "awardMsg",
+      "Заполните все поля."
+    );
+
+    return;
+
+  }
+
+
+  showMessage(
+    "awardMsg",
+    "Выдача награды..."
+  );
+
+
+  try{
+
+    const {
+      data,
+      error
+    } =
+    await db.functions.invoke(
+      "award-medal",
+      {
+        body:{
+          user_id,
+          medal_name,
+          reason
+        }
+      }
+    );
+
+
+    if(error){
+
+      console.error(
+        error
+      );
+
+      showMessage(
+        "awardMsg",
+        error.message ||
+        "Ошибка Edge Function."
+      );
+
+      return;
+
+    }
+
+
+    if(
+      !data ||
+      !data.ok
+    ){
+
+      showMessage(
+        "awardMsg",
+        data?.error ||
+        "Не удалось выдать медаль."
+      );
+
+      return;
+
+    }
+
+
+    showMessage(
+      "awardMsg",
+      "Медаль успешно выдана.",
+      true
+    );
+
+
+    $("awardName").value = "";
+
+    $("awardReason").value = "";
+
+
+    await refresh();
+
+  }
+
+  catch(error){
+
+    console.error(
+      error
+    );
+
+    showMessage(
+      "awardMsg",
+      error.message ||
+      "Неизвестная ошибка."
+    );
+
+  }
+
+}
+
+
+/* =====================================================
+   OPEN AWARD FORM
+===================================================== */
+
+function openAward(
+  id
+){
+
+  /*
+    Переключаемся на вкладку Медали.
+  */
+
+  const medalsTab =
+    document.querySelector(
+      '[data-tab="medals"]'
+    );
+
+
+  if(medalsTab){
+
+    medalsTab.click();
+
+  }
+
+
+  $("awardUser").value =
+    id;
+
+
+  $("awardName").focus();
+
+}
+
+
+/* =====================================================
+   TABS
+===================================================== */
+
+document
+  .querySelectorAll(".tab")
+  .forEach(
+    button => {
+
+      button.addEventListener(
+        "click",
+        () => {
+
+          /*
+            Сначала снимаем active
+            со всех вкладок.
+          */
+
+          document
+            .querySelectorAll(".tab")
+            .forEach(
+              item =>
+                item.classList.remove(
+                  "active"
+                )
+            );
+
+
+          /*
+            Скрываем все страницы.
+          */
+
+          document
+            .querySelectorAll(".tabpane")
+            .forEach(
+              item =>
+                item.classList.add(
+                  "hidden"
+                )
+            );
+
+
+          /*
+            Активируем текущую.
+          */
+
+          button.classList.add(
+            "active"
+          );
+
+
+          const target =
+            $(button.dataset.tab);
+
+
+          if(target){
+
+            target.classList.remove(
+              "hidden"
+            );
+
+          }
+
+        }
+      );
+
+    }
+  );
+
+
+/* =====================================================
+   EVENTS
+===================================================== */
+
+$("loginBtn")
+  .addEventListener(
+    "click",
+    login
+  );
+
+
+$("loginPass")
+  .addEventListener(
+    "keydown",
+    event => {
+
+      if(
+        event.key === "Enter"
+      ){
+
+        login();
+
+      }
+
+    }
+  );
+
+
+$("logoutBtn")
+  .addEventListener(
+    "click",
+    async () => {
+
+      await db.auth.signOut();
+
+      me = null;
+
+      profiles = [];
+
+      medals = [];
+
+      showLogin();
+
+    }
+  );
+
+
+$("personnelSearch")
+  .addEventListener(
+    "input",
+    renderPersonnel
+  );
+
+
+$("createBtn")
+  .addEventListener(
+    "click",
+    createAccount
+  );
+
+
+$("awardBtn")
+  .addEventListener(
+    "click",
+    award
+  );
+
+
+/*
+  Делаем функции доступными
+  для onclick в таблицах.
+*/
+
+window.removeAccount =
+  removeAccount;
+
+window.openAward =
+  openAward;
+
+
+/* =====================================================
+   AUTH STATE
+===================================================== */
+
+db.auth.onAuthStateChange(
+  async (
+    event,
+    session
+  ) => {
+
+    console.log(
+      "Auth state:",
+      event
+    );
+
+
+    /*
+      SIGNED_IN:
+      пользователь вошёл.
+
+      INITIAL_SESSION:
+      Supabase восстановил
+      существующую сессию.
+    */
+
+    if(
+      session &&
+      (
+        event === "SIGNED_IN" ||
+        event === "INITIAL_SESSION"
+      )
+    ){
+
+      await load();
+
+    }
+
+
+    if(
+      event === "SIGNED_OUT"
+    ){
+
+      me = null;
+
+      showLogin();
+
+    }
+
+  }
+);
+
+
+/* =====================================================
+   INITIAL START
+===================================================== */
+
+(async function(){
+
+  /*
+    ВАЖНО:
+
+    Если Publishable Key ещё не вставлен,
+    показываем понятную ошибку.
+  */
+
+  if(
+    !SUPABASE_URL ||
+    SUPABASE_URL.includes(
+      "YOUR_PROJECT"
+    )
+  ){
+
+    showMessage(
+      "loginMsg",
+      "Укажите SUPABASE_URL в index.html."
+    );
+
+    return;
+
+  }
+
+
+  if(
+    !SUPABASE_PUBLISHABLE_KEY ||
+    SUPABASE_PUBLISHABLE_KEY.includes(
+      "ВСТАВЬ_СЮДА"
+    ) ||
+    SUPABASE_PUBLISHABLE_KEY.includes(
+      "YOUR_KEY"
+    )
+  ){
+
+    showMessage(
+      "loginMsg",
+      "Укажите Publishable Key Supabase в index.html."
+    );
+
+    return;
+
+  }
+
+
+  /*
+    Проверяем существующую сессию.
+  */
+
+  await load();
+
+})();
+
+</script>
+
+</body>
+</html>
