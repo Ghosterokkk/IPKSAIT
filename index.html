@@ -164,6 +164,7 @@ main{padding:28px;max-width:1450px;width:100%;margin:auto}.title{margin-bottom:2
   </div>
 </section>
 
+<audio id="loginMusic" src="./music/login.mp3" preload="auto"></audio>
 <div id="toast"></div>
 
 <script>
@@ -178,7 +179,7 @@ main{padding:28px;max-width:1450px;width:100%;margin:auto}.title{margin-bottom:2
     "https://mthicokgzlifzvxgjulc.supabase.co";
 
   const FLEET_SUPABASE_PUBLISHABLE_KEY =
-    "sb_publishable_1v7XKkctZSbwGss0ULXoZQ_2tYdrMHx";
+    "ВСТАВЬ_СЮДА_СВОЙ_SB_PUBLISHABLE_KEY";
 
   /*
     ВАЖНО:
@@ -438,6 +439,15 @@ main{padding:28px;max-width:1450px;width:100%;margin:auto}.title{margin-bottom:2
       console.error("LOGIN ERROR",error);
       $("loginError").textContent=error.message;
       return;
+    }
+
+    const loginMusic = $("loginMusic");
+    if (loginMusic) {
+      loginMusic.currentTime = 0;
+      loginMusic.volume = 1;
+      loginMusic.play().catch(err => {
+        console.warn("Браузер заблокировал автоматическое воспроизведение:", err);
+      });
     }
 
     await boot();
