@@ -1,4187 +1,622 @@
 <!DOCTYPE html>
 <html lang="ru">
-
 <head>
-
 <meta charset="UTF-8">
-
-<meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0"
->
-
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>Fleet Command</title>
-
-
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-
 <style>
-
-* {
-    box-sizing: border-box;
-}
-
-
-:root {
-
-    --bg:
-        #080d14;
-
-    --panel:
-        #111a25;
-
-    --panel2:
-        #162231;
-
-    --border:
-        #26384d;
-
-    --text:
-        #edf4ff;
-
-    --muted:
-        #8191a5;
-
-    --blue:
-        #2997ff;
-
-    --yellow:
-        #ffd400;
-
-    --red:
-        #ff4d5e;
-
-    --green:
-        #36d48a;
-
-}
-
-
-body {
-
-    margin: 0;
-
-    background:
-        radial-gradient(
-            circle at top,
-            #17283b 0,
-            var(--bg) 45%
-        );
-
-    color:
-        var(--text);
-
-    font-family:
-        Arial,
-        Helvetica,
-        sans-serif;
-
-    min-height: 100vh;
-
-}
-
-
-button,
-input,
-select,
-textarea {
-
-    font: inherit;
-
-}
-
-
-button {
-
-    cursor: pointer;
-
-}
-
-
-.hidden {
-
-    display: none !important;
-
-}
-
-
-/* =========================================================
-   LOGIN
-========================================================= */
-
-#loginScreen {
-
-    min-height: 100vh;
-
-    display: flex;
-
-    justify-content: center;
-
-    align-items: center;
-
-    padding: 25px;
-
-}
-
-
-.loginBox {
-
-    width: 100%;
-
-    max-width: 430px;
-
-    background:
-        rgba(17, 26, 37, .96);
-
-    border:
-        1px solid var(--border);
-
-    border-radius: 20px;
-
-    padding: 35px;
-
-    box-shadow:
-        0 30px 80px rgba(0,0,0,.5);
-
-}
-
-
-.logo {
-
-    width: 65px;
-
-    height: 65px;
-
-    border-radius: 18px;
-
-    display: flex;
-
-    align-items: center;
-
-    justify-content: center;
-
-    background:
-        linear-gradient(
-            135deg,
-            #153b63,
-            #10202f
-        );
-
-    border:
-        1px solid #31577e;
-
-    font-size: 30px;
-
-    margin-bottom: 20px;
-
-}
-
-
-.loginBox h1 {
-
-    margin: 0 0 7px;
-
-}
-
-
-.loginBox p {
-
-    color:
-        var(--muted);
-
-    margin-top: 0;
-
-}
-
-
-label {
-
-    display: block;
-
-    color:
-        #aebbd0;
-
-    font-size: 13px;
-
-    margin:
-        17px 0 7px;
-
-}
-
-
-input,
-select,
-textarea {
-
-    width: 100%;
-
-    background:
-        #0b131d;
-
-    border:
-        1px solid var(--border);
-
-    color:
-        var(--text);
-
-    padding:
-        12px 13px;
-
-    border-radius:
-        9px;
-
-    outline:
-        none;
-
-}
-
-
-input:focus,
-select:focus,
-textarea:focus {
-
-    border-color:
-        var(--blue);
-
-    box-shadow:
-        0 0 0 3px rgba(41,151,255,.12);
-
-}
-
-
-button.primary {
-
-    width: 100%;
-
-    margin-top: 20px;
-
-    padding: 13px;
-
-    border: 0;
-
-    border-radius: 9px;
-
-    color: white;
-
-    background:
-        linear-gradient(
-            135deg,
-            #1686ed,
-            #276cff
-        );
-
-}
-
-
-button.primary:hover {
-
-    filter:
-        brightness(1.12);
-
-}
-
-
-.error {
-
-    color:
-        #ff7b87;
-
-    margin-top: 15px;
-
-    font-size: 13px;
-
-}
-
-
-/* =========================================================
-   APP
-========================================================= */
-
-#app {
-
-    min-height: 100vh;
-
-}
-
-
-.topbar {
-
-    height: 72px;
-
-    display: flex;
-
-    align-items: center;
-
-    justify-content: space-between;
-
-    padding:
-        0 28px;
-
-    background:
-        rgba(9,15,23,.9);
-
-    border-bottom:
-        1px solid var(--border);
-
-    backdrop-filter:
-        blur(14px);
-
-    position: sticky;
-
-    top: 0;
-
-    z-index: 20;
-
-}
-
-
-.brand {
-
-    display: flex;
-
-    align-items: center;
-
-    gap: 13px;
-
-    font-weight: bold;
-
-}
-
-
-.brandIcon {
-
-    width: 40px;
-
-    height: 40px;
-
-    display: flex;
-
-    align-items: center;
-
-    justify-content: center;
-
-    border-radius: 11px;
-
-    background:
-        #102c49;
-
-    border:
-        1px solid #26547c;
-
-}
-
-
-.userTop {
-
-    display: flex;
-
-    align-items: center;
-
-    gap: 15px;
-
-}
-
-
-.userName {
-
-    text-align: right;
-
-}
-
-
-.userName strong {
-
-    display: block;
-
-}
-
-
-.userName small {
-
-    color:
-        var(--muted);
-
-}
-
-
-.logout {
-
-    border:
-        1px solid #51303a;
-
-    background:
-        #24151a;
-
-    color:
-        #ff8792;
-
-    padding:
-        9px 13px;
-
-    border-radius:
-        8px;
-
-}
-
-
-/* =========================================================
-   LAYOUT
-========================================================= */
-
-.layout {
-
-    display: grid;
-
-    grid-template-columns:
-        250px 1fr;
-
-    min-height:
-        calc(100vh - 72px);
-
-}
-
-
-.sidebar {
-
-    border-right:
-        1px solid var(--border);
-
-    padding:
-        22px 15px;
-
-    background:
-        rgba(8,14,22,.65);
-
-}
-
-
-.navButton {
-
-    width: 100%;
-
-    text-align: left;
-
-    border: 0;
-
-    background: transparent;
-
-    color:
-        #9eafc3;
-
-    padding:
-        12px 13px;
-
-    border-radius:
-        9px;
-
-    margin-bottom:
-        5px;
-
-}
-
-
-.navButton:hover,
-.navButton.active {
-
-    background:
-        #16283b;
-
-    color:
-        white;
-
-}
-
-
-.main {
-
-    padding:
-        30px;
-
-    max-width:
-        1500px;
-
-    width: 100%;
-
-    margin:
-        auto;
-
-}
-
-
-.pageTitle {
-
-    margin-bottom:
-        25px;
-
-}
-
-
-.pageTitle h1 {
-
-    margin:
-        0 0 5px;
-
-    font-size:
-        30px;
-
-}
-
-
-.pageTitle p {
-
-    color:
-        var(--muted);
-
-    margin: 0;
-
-}
-
-
-/* =========================================================
-   CARDS
-========================================================= */
-
-.stats {
-
-    display:
-        grid;
-
-    grid-template-columns:
-        repeat(4, 1fr);
-
-    gap:
-        15px;
-
-    margin-bottom:
-        20px;
-
-}
-
-
-.stat {
-
-    background:
-        rgba(17,26,37,.9);
-
-    border:
-        1px solid var(--border);
-
-    border-radius:
-        14px;
-
-    padding:
-        20px;
-
-}
-
-
-.stat span {
-
-    display: block;
-
-    color:
-        var(--muted);
-
-    font-size:
-        12px;
-
-    margin-bottom:
-        8px;
-
-}
-
-
-.stat strong {
-
-    font-size:
-        27px;
-
-}
-
-
-/* =========================================================
-   PANELS
-========================================================= */
-
-.panel {
-
-    background:
-        rgba(17,26,37,.92);
-
-    border:
-        1px solid var(--border);
-
-    border-radius:
-        15px;
-
-    padding:
-        22px;
-
-    margin-bottom:
-        20px;
-
-}
-
-
-.panelTitle {
-
-    display:
-        flex;
-
-    justify-content:
-        space-between;
-
-    align-items:
-        center;
-
-    gap:
-        15px;
-
-    margin-bottom:
-        20px;
-
-}
-
-
-.panelTitle h2 {
-
-    margin:
-        0;
-
-    font-size:
-        18px;
-
-}
-
-
-.grid2 {
-
-    display:
-        grid;
-
-    grid-template-columns:
-        1fr 1fr;
-
-    gap:
-        16px;
-
-}
-
-
-.grid3 {
-
-    display:
-        grid;
-
-    grid-template-columns:
-        repeat(3,1fr);
-
-    gap:
-        16px;
-
-}
-
-
-.formGroup {
-
-    margin-bottom:
-        3px;
-
-}
-
-
-/* =========================================================
-   COMMAND BUTTON
-========================================================= */
-
-.commandButton {
-
-    border:
-        1px solid #29577f;
-
-    background:
-        #102942;
-
-    color:
-        #b8ddff;
-
-    padding:
-        10px 14px;
-
-    border-radius:
-        8px;
-
-}
-
-
-.commandButton:hover {
-
-    background:
-        #153856;
-
-}
-
-
-.dangerButton {
-
-    border:
-        1px solid #67303a;
-
-    background:
-        #28151a;
-
-    color:
-        #ff8690;
-
-    padding:
-        8px 12px;
-
-    border-radius:
-        7px;
-
-}
-
-
-.successButton {
-
-    border:
-        1px solid #27654d;
-
-    background:
-        #102c21;
-
-    color:
-        #65e7ab;
-
-    padding:
-        8px 12px;
-
-    border-radius:
-        7px;
-
-}
-
-
-/* =========================================================
-   TABLE
-========================================================= */
-
-.tableWrap {
-
-    overflow-x:
-        auto;
-
-}
-
-
-table {
-
-    width: 100%;
-
-    border-collapse:
-        collapse;
-
-}
-
-
-th {
-
-    color:
-        #7f91a8;
-
-    font-size:
-        12px;
-
-    text-align:
-        left;
-
-    font-weight:
-        normal;
-
-    padding:
-        12px;
-
-    border-bottom:
-        1px solid var(--border);
-
-}
-
-
-td {
-
-    padding:
-        13px 12px;
-
-    border-bottom:
-        1px solid #1c2937;
-
-}
-
-
-tr:hover td {
-
-    background:
-        rgba(255,255,255,.018);
-
-}
-
-
-.badge {
-
-    display:
-        inline-block;
-
-    padding:
-        4px 8px;
-
-    border-radius:
-        999px;
-
-    font-size:
-        11px;
-
-}
-
-
-.badge.command {
-
-    background:
-        rgba(255,212,0,.12);
-
-    color:
-        var(--yellow);
-
-}
-
-
-.badge.tech {
-
-    background:
-        rgba(41,151,255,.12);
-
-    color:
-        #68b7ff;
-
-}
-
-
-.badge.personnel {
-
-    background:
-        rgba(54,212,138,.1);
-
-    color:
-        #64dca0;
-
-}
-
-
-/* =========================================================
-   MEDALS
-========================================================= */
-
-.medal {
-
-    padding:
-        15px;
-
-    border:
-        1px solid var(--border);
-
-    border-radius:
-        11px;
-
-    background:
-        #0d1722;
-
-    margin-bottom:
-        10px;
-
-}
-
-
-.medalName {
-
-    font-weight:
-        bold;
-
-}
-
-
-.medalDescription {
-
-    color:
-        var(--muted);
-
-    font-size:
-        13px;
-
-    margin-top:
-        5px;
-
-}
-
-
-/* =========================================================
-   CHECKBOXES
-========================================================= */
-
-.permissions {
-
-    display:
-        grid;
-
-    grid-template-columns:
-        1fr 1fr;
-
-    gap:
-        9px;
-
-    margin-top:
-        10px;
-
-}
-
-
-.permission {
-
-    display:
-        flex;
-
-    align-items:
-        center;
-
-    gap:
-        8px;
-
-    color:
-        #b9c5d5;
-
-    font-size:
-        13px;
-
-}
-
-
-.permission input {
-
-    width:
-        auto;
-
-}
-
-
-/* =========================================================
-   TOAST
-========================================================= */
-
-#toast {
-
-    position:
-        fixed;
-
-    right:
-        25px;
-
-    bottom:
-        25px;
-
-    z-index:
-        100;
-
-    padding:
-        13px 17px;
-
-    background:
-        #162334;
-
-    border:
-        1px solid #30475e;
-
-    border-radius:
-        10px;
-
-    box-shadow:
-        0 15px 40px rgba(0,0,0,.45);
-
-    transform:
-        translateY(120px);
-
-    opacity:
-        0;
-
-    transition:
-        .25s;
-
-}
-
-
-#toast.show {
-
-    transform:
-        translateY(0);
-
-    opacity:
-        1;
-
-}
-
-
-#toast.error {
-
-    border-color:
-        #63333b;
-
-}
-
-
-/* =========================================================
-   RESPONSIVE
-========================================================= */
-
-@media(max-width: 1000px) {
-
-    .layout {
-
-        grid-template-columns:
-            1fr;
-
-    }
-
-    .sidebar {
-
-        display:
-            none;
-
-    }
-
-    .stats {
-
-        grid-template-columns:
-            1fr 1fr;
-
-    }
-
-}
-
-
-@media(max-width: 650px) {
-
-    .main {
-
-        padding:
-            18px;
-
-    }
-
-    .stats,
-    .grid2,
-    .grid3 {
-
-        grid-template-columns:
-            1fr;
-
-    }
-
-    .topbar {
-
-        padding:
-            0 15px;
-
-    }
-
-    .userName {
-
-        display:
-            none;
-
-    }
-
-    .permissions {
-
-        grid-template-columns:
-            1fr;
-
-    }
-
-}
-
+*{box-sizing:border-box}
+:root{--bg:#080d14;--panel:#111a25;--panel2:#162231;--border:#293b50;--text:#edf4ff;--muted:#8494a8;--blue:#2997ff;--yellow:#ffd400;--red:#ff5968;--green:#3bd592}
+body{margin:0;background:radial-gradient(circle at top,#17283b 0,#080d14 48%);color:var(--text);font-family:Arial,sans-serif;min-height:100vh}
+button,input,select,textarea{font:inherit}
+button{cursor:pointer}
+.hidden{display:none!important}
+#login{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
+.login-card{width:min(430px,100%);background:rgba(17,26,37,.96);border:1px solid var(--border);border-radius:20px;padding:32px;box-shadow:0 30px 80px #0008}
+.logo{width:62px;height:62px;border-radius:16px;background:#102c49;border:1px solid #2b587d;display:grid;place-items:center;font-size:30px;margin-bottom:18px}
+h1,h2,h3,p{margin-top:0}.muted{color:var(--muted)}
+label{display:block;color:#aebbd0;font-size:13px;margin:15px 0 7px}
+input,select,textarea{width:100%;background:#0b131d;border:1px solid var(--border);color:var(--text);padding:11px 12px;border-radius:9px;outline:0}
+input:focus,select:focus,textarea:focus{border-color:var(--blue);box-shadow:0 0 0 3px #2997ff1f}
+.primary{border:0;background:linear-gradient(135deg,#1686ed,#276cff);color:#fff;border-radius:9px;padding:12px 15px}
+.primary.full{width:100%;margin-top:20px}
+.secondary,.danger{border-radius:8px;padding:8px 12px}
+.secondary{background:#102942;color:#b8ddff;border:1px solid #29577f}
+.danger{background:#28151a;color:#ff8690;border:1px solid #67303a}
+.error{color:#ff7b87;font-size:13px;margin-top:12px}
+#app{min-height:100vh}.top{height:70px;position:sticky;top:0;z-index:10;background:#090f17eF;border-bottom:1px solid var(--border);backdrop-filter:blur(12px);display:flex;align-items:center;justify-content:space-between;padding:0 24px}
+.brand{display:flex;align-items:center;gap:12px;font-weight:bold}.brand-icon{width:40px;height:40px;border-radius:11px;background:#102c49;border:1px solid #2b587d;display:grid;place-items:center}
+.user{display:flex;align-items:center;gap:13px}.user-info{text-align:right}.user-info small{display:block;color:var(--muted)}.logout{background:#24151a;border:1px solid #51303a;color:#ff8792;padding:8px 12px;border-radius:8px}
+.layout{display:grid;grid-template-columns:240px 1fr;min-height:calc(100vh - 70px)}
+.sidebar{padding:18px 13px;border-right:1px solid var(--border);background:#080e16aa}.nav{width:100%;border:0;background:transparent;color:#9eafc3;text-align:left;padding:11px 13px;border-radius:9px;margin-bottom:4px}.nav:hover,.nav.active{background:#16283b;color:#fff}
+main{padding:28px;max-width:1450px;width:100%;margin:auto}.title{margin-bottom:22px}.title h1{font-size:29px;margin-bottom:5px}.title p{color:var(--muted)}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:18px}.stat,.panel{background:#111a25eb;border:1px solid var(--border);border-radius:14px}.stat{padding:18px}.stat span{display:block;color:var(--muted);font-size:12px;margin-bottom:7px}.stat strong{font-size:26px}
+.panel{padding:20px;margin-bottom:18px}.panel-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:17px}.panel-head h2{font-size:18px;margin:0}.grid2{display:grid;grid-template-columns:1fr 1fr;gap:15px}.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:15px}
+.table-wrap{overflow:auto}table{width:100%;border-collapse:collapse;min-width:850px}th{color:#7f91a8;font-size:12px;font-weight:normal;text-align:left;padding:11px;border-bottom:1px solid var(--border)}td{padding:12px 11px;border-bottom:1px solid #1c2937}tr:hover td{background:#ffffff03}
+.badge{display:inline-block;padding:4px 8px;border-radius:999px;font-size:11px}.command{background:#ffd4001c;color:#ffd400}.tech{background:#2997ff1c;color:#68b7ff}.personnel{background:#3bd5921a;color:#64dca0}
+.rank-row{display:flex;justify-content:space-between;gap:10px;padding:11px 0;border-bottom:1px solid #1c2937}.rank-row:last-child{border-bottom:0}
+.perms{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}.perm{display:flex;align-items:center;gap:8px;color:#b9c5d5}.perm input{width:auto}
+.medal{padding:14px;border:1px solid var(--border);border-radius:10px;background:#0d1722;margin-bottom:9px}.medal strong{display:block}.medal small{display:block;color:var(--muted);margin-top:5px}
+#toast{position:fixed;right:20px;bottom:20px;padding:12px 16px;border:1px solid #30475e;background:#162334;border-radius:10px;box-shadow:0 15px 40px #0007;transform:translateY(100px);opacity:0;transition:.25s;z-index:100}.show{transform:translateY(0)!important;opacity:1!important}.toast-error{border-color:#63333b!important}
+@media(max-width:950px){.layout{grid-template-columns:1fr}.sidebar{display:flex;overflow:auto;gap:5px;border-right:0;border-bottom:1px solid var(--border)}.nav{white-space:nowrap;width:auto}.stats{grid-template-columns:1fr 1fr}}
+@media(max-width:650px){main{padding:16px}.grid2,.grid3,.stats{grid-template-columns:1fr}.user-info{display:none}.perms{grid-template-columns:1fr}}
 </style>
-
 </head>
-
-
 <body>
 
-
-<!-- ========================================================
-     LOGIN
-======================================================== -->
-
-<section id="loginScreen">
-
-    <div class="loginBox">
-
-        <div class="logo">
-            ⚓
-        </div>
-
-        <h1>
-            Fleet Command
-        </h1>
-
-        <p>
-            Система управления личным составом
-        </p>
-
-
-        <label>
-            Имя пользователя
-        </label>
-
-        <input
-            id="loginUsername"
-            autocomplete="username"
-            placeholder="admin"
-        >
-
-
-        <label>
-            Пароль
-        </label>
-
-        <input
-            id="loginPassword"
-            type="password"
-            autocomplete="current-password"
-            placeholder="Пароль"
-        >
-
-
-        <button
-            class="primary"
-            id="loginButton"
-        >
-            Войти
-        </button>
-
-
-        <div
-            class="error"
-            id="loginError"
-        ></div>
-
-    </div>
-
+<section id="login">
+  <div class="login-card">
+    <div class="logo">⚓</div>
+    <h1>Fleet Command</h1>
+    <p class="muted">Система управления личным составом</p>
+    <label>Имя пользователя</label>
+    <input id="loginUsername" autocomplete="username" placeholder="admin">
+    <label>Пароль</label>
+    <input id="loginPassword" type="password" autocomplete="current-password" placeholder="Пароль">
+    <button id="loginBtn" class="primary full">Войти</button>
+    <div id="loginError" class="error"></div>
+  </div>
 </section>
 
-
-<!-- ========================================================
-     APP
-======================================================== -->
-
-<section
-    id="app"
-    class="hidden"
->
-
-
-<header class="topbar">
-
-    <div class="brand">
-
-        <div class="brandIcon">
-            ⚓
-        </div>
-
-        <span>
-            FLEET COMMAND
-        </span>
-
+<section id="app" class="hidden">
+  <header class="top">
+    <div class="brand"><div class="brand-icon">⚓</div><span>FLEET COMMAND</span></div>
+    <div class="user">
+      <div class="user-info"><strong id="topUser">—</strong><small id="topRank">—</small></div>
+      <button id="logoutBtn" class="logout">Выйти</button>
     </div>
+  </header>
 
+  <div class="layout">
+    <aside class="sidebar">
+      <button class="nav active" data-page="dashboard">Главная</button>
+      <button class="nav" data-page="personnel">Личный состав</button>
+      <button class="nav" data-page="create">Создать аккаунт</button>
+      <button class="nav" data-page="medals">Награды</button>
+      <button class="nav" data-page="technical">Технические работники</button>
+    </aside>
 
-    <div class="userTop">
-
-        <div class="userName">
-
-            <strong id="topUsername">
-                —
-            </strong>
-
-            <small id="topRank">
-                —
-            </small>
-
+    <main>
+      <section id="page-dashboard" class="page">
+        <div class="title"><h1>Панель управления</h1><p>Управление личным составом флота</p></div>
+        <div class="stats">
+          <div class="stat"><span>Личный состав</span><strong id="statUsers">0</strong></div>
+          <div class="stat"><span>Технические работники</span><strong id="statTech">0</strong></div>
+          <div class="stat"><span>Награды</span><strong id="statMedals">0</strong></div>
+          <div class="stat"><span>Ваш уровень</span><strong id="statLevel">0</strong></div>
         </div>
-
-
-        <button
-            class="logout"
-            id="logoutButton"
-        >
-            Выйти
-        </button>
-
-    </div>
-
-</header>
-
-
-<div class="layout">
-
-
-<!-- ========================================================
-     SIDEBAR
-======================================================== -->
-
-<aside class="sidebar">
-
-    <button
-        class="navButton active"
-        data-section="dashboard"
-    >
-        Главная
-    </button>
-
-
-    <button
-        class="navButton"
-        data-section="personnel"
-    >
-        Личный состав
-    </button>
-
-
-    <button
-        class="navButton"
-        data-section="create"
-    >
-        Создать аккаунт
-    </button>
-
-
-    <button
-        class="navButton"
-        data-section="medals"
-    >
-        Награды
-    </button>
-
-
-    <button
-        class="navButton"
-        data-section="technical"
-    >
-        Технические работники
-    </button>
-
-</aside>
-
-
-<!-- ========================================================
-     MAIN
-======================================================== -->
-
-<main class="main">
-
-
-<!-- ========================================================
-     DASHBOARD
-======================================================== -->
-
-<section
-    id="section-dashboard"
-    class="pageSection"
->
-
-    <div class="pageTitle">
-
-        <h1>
-            Панель управления
-        </h1>
-
-        <p>
-            Управление личным составом флота
-        </p>
-
-    </div>
-
-
-    <div class="stats">
-
-        <div class="stat">
-
-            <span>
-                Личный состав
-            </span>
-
-            <strong id="statUsers">
-                0
-            </strong>
-
+        <div class="panel">
+          <div class="panel-head"><h2>Ваш профиль</h2></div>
+          <div class="grid3">
+            <div><label>Номер</label><input id="profileNumber" disabled></div>
+            <div><label>Позывной</label><input id="profileCallsign" disabled></div>
+            <div><label>Звание</label><input id="profileRank" disabled></div>
+          </div>
         </div>
+        <div class="panel"><div class="panel-head"><h2>Звания</h2></div><div id="rankList"></div></div>
+      </section>
 
-
-        <div class="stat">
-
-            <span>
-                Технические работники
-            </span>
-
-            <strong id="statTech">
-                0
-            </strong>
-
+      <section id="page-personnel" class="page hidden">
+        <div class="title"><h1>Личный состав</h1><p>Все зарегистрированные пользователи</p></div>
+        <div class="panel">
+          <div class="panel-head"><h2>Пользователи</h2><button id="refreshBtn" class="secondary">Обновить</button></div>
+          <input id="search" placeholder="Поиск по номеру, имени, позывному или званию...">
+          <div class="table-wrap"><table><thead><tr><th>№</th><th>Пользователь</th><th>Позывной</th><th>Звание</th><th>Уровень</th><th>Подгруппа</th><th>Действия</th></tr></thead><tbody id="personnelBody"></tbody></table></div>
         </div>
+      </section>
 
-
-        <div class="stat">
-
-            <span>
-                Награды
-            </span>
-
-            <strong id="statMedals">
-                0
-            </strong>
-
-        </div>
-
-
-        <div class="stat">
-
-            <span>
-                Ваш уровень
-            </span>
-
-            <strong id="statLevel">
-                0
-            </strong>
-
-        </div>
-
-    </div>
-
-
-    <div class="panel">
-
-        <div class="panelTitle">
-
-            <h2>
-                Ваш профиль
-            </h2>
-
-        </div>
-
-
-        <div class="grid3">
-
-            <div>
-
-                <label>
-                    Номер
-                </label>
-
-                <input
-                    id="profileNumber"
-                    disabled
-                >
-
+      <section id="page-create" class="page hidden">
+        <div class="title"><h1>Создание аккаунта</h1><p>Доступно только Адмиралу флота, Адмиралу, Вице-адмиралу и Контр-адмиралу</p></div>
+        <div id="createDenied" class="panel hidden"><h2>Недостаточно прав</h2><p class="muted">Создавать аккаунты могут только четыре высших ранга.</p></div>
+        <div id="createPanel" class="panel">
+          <div class="grid2">
+            <div><label>Номер</label><input id="createNumber" placeholder="001"></div>
+            <div><label>Имя пользователя</label><input id="createUsername" placeholder="ivan"></div>
+            <div><label>Позывной</label><input id="createCallsign" placeholder="WOLF"></div>
+            <div><label>Пароль</label><input id="createPassword" type="password" placeholder="Минимум 8 символов"></div>
+            <div><label>Звание</label><select id="createRank"></select></div>
+            <div><label>Подгруппа</label><select id="createSubgroup"><option value="PERSONNEL">Личный состав</option><option value="TECHNICAL">Технический работник</option></select></div>
+          </div>
+          <div id="createTechBox" class="hidden">
+            <label>Технические права</label>
+            <div class="perms">
+              <label class="perm"><input id="cViewProfiles" type="checkbox"> Просмотр личного состава</label>
+              <label class="perm"><input id="cEditProfile" type="checkbox"> Редактирование профилей</label>
+              <label class="perm"><input id="cViewAudit" type="checkbox"> Просмотр журнала</label>
+              <label class="perm"><input id="cTechnicalSettings" type="checkbox"> Технические настройки</label>
             </div>
-
-
-            <div>
-
-                <label>
-                    Позывной
-                </label>
-
-                <input
-                    id="profileCallsign"
-                    disabled
-                >
-
-            </div>
-
-
-            <div>
-
-                <label>
-                    Звание
-                </label>
-
-                <input
-                    id="profileRank"
-                    disabled
-                >
-
-            </div>
-
+          </div>
+          <button id="createBtn" class="primary full">Создать аккаунт</button>
         </div>
+      </section>
 
-    </div>
-
-
-    <div class="panel">
-
-        <div class="panelTitle">
-
-            <h2>
-                Система званий
-            </h2>
-
+      <section id="page-medals" class="page hidden">
+        <div class="title"><h1>Награды</h1><p>Выдача наград личному составу</p></div>
+        <div id="medalDenied" class="panel hidden"><h2>Недостаточно прав</h2><p class="muted">Выдавать награды могут только четыре высших ранга.</p></div>
+        <div id="medalPanel" class="panel">
+          <div class="grid2">
+            <div><label>Получатель</label><select id="medalUser"></select></div>
+            <div><label>Название награды</label><input id="medalName" placeholder="За выдающиеся заслуги"></div>
+          </div>
+          <label>Описание</label><textarea id="medalDescription" rows="4" placeholder="Описание заслуги..."></textarea>
+          <button id="awardBtn" class="primary full">Выдать награду</button>
         </div>
+        <div class="panel"><div class="panel-head"><h2>Выданные награды</h2></div><div id="medalList"></div></div>
+      </section>
 
-
-        <div
-            id="rankList"
-        ></div>
-
-    </div>
-
+      <section id="page-technical" class="page hidden">
+        <div class="title"><h1>Технические работники</h1><p>Настройка индивидуальных технических прав</p></div>
+        <div id="techDenied" class="panel hidden"><h2>Недостаточно прав</h2><p class="muted">Настраивать технические права могут только четыре высших ранга.</p></div>
+        <div id="techPanel" class="panel">
+          <label>Технический работник</label><select id="techUser"></select>
+          <label>Разрешения</label>
+          <div class="perms">
+            <label class="perm"><input id="tViewProfiles" type="checkbox"> Просмотр личного состава</label>
+            <label class="perm"><input id="tEditProfile" type="checkbox"> Редактирование профилей</label>
+            <label class="perm"><input id="tViewAudit" type="checkbox"> Просмотр журнала</label>
+            <label class="perm"><input id="tTechnicalSettings" type="checkbox"> Технические настройки</label>
+          </div>
+          <button id="saveTechBtn" class="primary full">Сохранить права</button>
+        </div>
+      </section>
+    </main>
+  </div>
 </section>
-
-
-<!-- ========================================================
-     PERSONNEL
-======================================================== -->
-
-<section
-    id="section-personnel"
-    class="pageSection hidden"
->
-
-    <div class="pageTitle">
-
-        <h1>
-            Личный состав
-        </h1>
-
-        <p>
-            Все зарегистрированные пользователи
-        </p>
-
-    </div>
-
-
-    <div class="panel">
-
-        <div class="panelTitle">
-
-            <h2>
-                Пользователи
-            </h2>
-
-            <button
-                class="commandButton"
-                id="refreshButton"
-            >
-                Обновить
-            </button>
-
-        </div>
-
-
-        <input
-            id="searchPersonnel"
-            placeholder="Поиск по номеру, имени, позывному или званию..."
-        >
-
-
-        <div class="tableWrap">
-
-            <table>
-
-                <thead>
-
-                    <tr>
-
-                        <th>
-                            №
-                        </th>
-
-                        <th>
-                            Пользователь
-                        </th>
-
-                        <th>
-                            Позывной
-                        </th>
-
-                        <th>
-                            Звание
-                        </th>
-
-                        <th>
-                            Уровень
-                        </th>
-
-                        <th>
-                            Подгруппа
-                        </th>
-
-                        <th>
-                            Действия
-                        </th>
-
-                    </tr>
-
-                </thead>
-
-
-                <tbody
-                    id="personnelTable"
-                ></tbody>
-
-            </table>
-
-        </div>
-
-    </div>
-
-</section>
-
-
-<!-- ========================================================
-     CREATE
-======================================================== -->
-
-<section
-    id="section-create"
-    class="pageSection hidden"
->
-
-    <div class="pageTitle">
-
-        <h1>
-            Создание аккаунта
-        </h1>
-
-        <p>
-            Доступно только четырём высшим рангам
-        </p>
-
-    </div>
-
-
-    <div
-        id="createDenied"
-        class="panel hidden"
-    >
-
-        <h2>
-            Недостаточно прав
-        </h2>
-
-        <p>
-            Создавать аккаунты могут только
-            Адмирал флота, Адмирал,
-            Вице-адмирал и Контр-адмирал.
-        </p>
-
-    </div>
-
-
-    <div
-        id="createPanel"
-        class="panel"
-    >
-
-        <div class="grid2">
-
-
-            <div>
-
-                <label>
-                    Номер
-                </label>
-
-                <input
-                    id="createNumber"
-                    placeholder="001"
-                >
-
-            </div>
-
-
-            <div>
-
-                <label>
-                    Имя пользователя
-                </label>
-
-                <input
-                    id="createUsername"
-                    placeholder="ivan"
-                >
-
-            </div>
-
-
-            <div>
-
-                <label>
-                    Позывной
-                </label>
-
-                <input
-                    id="createCallsign"
-                    placeholder="WOLF"
-                >
-
-            </div>
-
-
-            <div>
-
-                <label>
-                    Пароль
-                </label>
-
-                <input
-                    id="createPassword"
-                    type="password"
-                    placeholder="Минимум 8 символов"
-                >
-
-            </div>
-
-
-            <div>
-
-                <label>
-                    Звание
-                </label>
-
-                <select
-                    id="createRank"
-                ></select>
-
-            </div>
-
-
-            <div>
-
-                <label>
-                    Подгруппа
-                </label>
-
-                <select
-                    id="createSubgroup"
-                >
-
-                    <option
-                        value="PERSONNEL"
-                    >
-                        Личный состав
-                    </option>
-
-                    <option
-                        value="TECHNICAL"
-                    >
-                        Технический работник
-                    </option>
-
-                </select>
-
-            </div>
-
-        </div>
-
-
-        <div
-            id="createTechPermissions"
-            class="hidden"
-        >
-
-            <label>
-                Технические права
-            </label>
-
-
-            <div class="permissions">
-
-                <label class="permission">
-
-                    <input
-                        type="checkbox"
-                        id="createViewProfiles"
-                    >
-
-                    Просмотр личного состава
-
-                </label>
-
-
-                <label class="permission">
-
-                    <input
-                        type="checkbox"
-                        id="createEditProfile"
-                    >
-
-                    Редактирование профилей
-
-                </label>
-
-
-                <label class="permission">
-
-                    <input
-                        type="checkbox"
-                        id="createViewAudit"
-                    >
-
-                    Просмотр журнала
-
-                </label>
-
-
-                <label class="permission">
-
-                    <input
-                        type="checkbox"
-                        id="createTechnicalSettings"
-                    >
-
-                    Технические настройки
-
-                </label>
-
-            </div>
-
-        </div>
-
-
-        <button
-            class="primary"
-            id="createButton"
-        >
-            Создать аккаунт
-        </button>
-
-    </div>
-
-</section>
-
-
-<!-- ========================================================
-     MEDALS
-======================================================== -->
-
-<section
-    id="section-medals"
-    class="pageSection hidden"
->
-
-    <div class="pageTitle">
-
-        <h1>
-            Награды
-        </h1>
-
-        <p>
-            Выдача наград личному составу
-        </p>
-
-    </div>
-
-
-    <div
-        id="medalDenied"
-        class="panel hidden"
-    >
-
-        <h2>
-            Недостаточно прав
-        </h2>
-
-        <p>
-            Выдавать награды могут только
-            четыре высших ранга.
-        </p>
-
-    </div>
-
-
-    <div
-        id="medalPanel"
-        class="panel"
-    >
-
-        <div class="grid2">
-
-            <div>
-
-                <label>
-                    Получатель
-                </label>
-
-                <select
-                    id="medalUser"
-                ></select>
-
-            </div>
-
-
-            <div>
-
-                <label>
-                    Название награды
-                </label>
-
-                <input
-                    id="medalName"
-                    placeholder="За выдающиеся заслуги"
-                >
-
-            </div>
-
-        </div>
-
-
-        <label>
-            Описание
-        </label>
-
-        <textarea
-            id="medalDescription"
-            rows="4"
-            placeholder="Описание заслуги..."
-        ></textarea>
-
-
-        <button
-            class="primary"
-            id="awardButton"
-        >
-            Выдать награду
-        </button>
-
-    </div>
-
-
-    <div class="panel">
-
-        <div class="panelTitle">
-
-            <h2>
-                Выданные награды
-            </h2>
-
-        </div>
-
-
-        <div
-            id="medalList"
-        ></div>
-
-    </div>
-
-</section>
-
-
-<!-- ========================================================
-     TECHNICAL
-======================================================== -->
-
-<section
-    id="section-technical"
-    class="pageSection hidden"
->
-
-    <div class="pageTitle">
-
-        <h1>
-            Технические работники
-        </h1>
-
-        <p>
-            Управление техническими правами
-        </p>
-
-    </div>
-
-
-    <div
-        id="technicalDenied"
-        class="panel hidden"
-    >
-
-        <h2>
-            Недостаточно прав
-        </h2>
-
-        <p>
-            Настраивать технические права могут
-            только четыре высших ранга.
-        </p>
-
-    </div>
-
-
-    <div
-        id="technicalPanel"
-        class="panel"
-    >
-
-        <label>
-            Технический работник
-        </label>
-
-        <select
-            id="technicalUser"
-        ></select>
-
-
-        <label>
-            Разрешения
-        </label>
-
-
-        <div class="permissions">
-
-            <label class="permission">
-
-                <input
-                    type="checkbox"
-                    id="techViewProfiles"
-                >
-
-                Просмотр личного состава
-
-            </label>
-
-
-            <label class="permission">
-
-                <input
-                    type="checkbox"
-                    id="techEditProfile"
-                >
-
-                Редактирование профилей
-
-            </label>
-
-
-            <label class="permission">
-
-                <input
-                    type="checkbox"
-                    id="techViewAudit"
-                >
-
-                Просмотр журнала
-
-            </label>
-
-
-            <label class="permission">
-
-                <input
-                    type="checkbox"
-                    id="techTechnicalSettings"
-                >
-
-                Технические настройки
-
-            </label>
-
-        </div>
-
-
-        <button
-            class="primary"
-            id="saveTechButton"
-        >
-            Сохранить права
-        </button>
-
-    </div>
-
-</section>
-
-
-</main>
-
-</div>
-
-</section>
-
 
 <div id="toast"></div>
 
-
 <script>
+(() => {
+  "use strict";
 
-/* =========================================================
-   SUPABASE CONFIG
-========================================================= */
+  /* =======================================================
+     НАСТРОЙКИ
+     ======================================================= */
 
-
-/*
-    ВСТАВЬ СЮДА СВОЙ PUBLISHABLE KEY.
-
-    НЕ ВСТАВЛЯЙ:
-    sb_secret_...
-    service_role
-*/
-
-
-const SUPABASE_URL =
+  const FLEET_SUPABASE_URL =
     "https://mthicokgzlifzvxgjulc.supabase.co";
 
-
-const SUPABASE_PUBLISHABLE_KEY =
+  const FLEET_SUPABASE_PUBLISHABLE_KEY =
     "sb_publishable_1v7XKkctZSbwGss0ULXoZQ_2tYdrMHx";
 
+  /*
+    ВАЖНО:
+    Здесь намеренно НЕТ переменной с именем "supabase".
+    Клиент называется fleetDb, чтобы не конфликтовать
+    со старым кодом/Google Sites/другими скриптами.
+  */
 
-const {
-    createClient
-} = window.supabase;
-
-
-const supabase =
-    createClient(
-        SUPABASE_URL,
-        SUPABASE_PUBLISHABLE_KEY
+  const fleetDb =
+    window.supabase.createClient(
+      FLEET_SUPABASE_URL,
+      FLEET_SUPABASE_PUBLISHABLE_KEY
     );
 
+  const RANKS = [
+    ["Адмирал флота",100],
+    ["Адмирал",94],
+    ["Вице-адмирал",88],
+    ["Контр-адмирал",83],
+    ["Капитан флота",77],
+    ["Коммандер флота",71],
+    ["Лейтенант-коммандер",66],
+    ["Лейтенант флота",60],
+    ["Прапорщик",55],
+    ["Сержант-майор воздушных войск",49],
+    ["Команд-сержант-майор",43],
+    ["Сержант-майор",38],
+    ["Мастер сержант",32],
+    ["Сержант первого класса",26],
+    ["Сержант",21],
+    ["Мичман",15],
+    ["Специалист",10]
+  ].map(([name,level]) => ({name,level}));
 
-/* =========================================================
-   RANKS
-========================================================= */
+  const COMMAND_LEVELS = new Set([100,94,88,83]);
 
-const RANKS = [
+  let currentProfile = null;
+  let profiles = [];
+  let medals = [];
 
-    {
-        name:
-            "Адмирал флота",
-        level: 100
-    },
+  const $ = id => document.getElementById(id);
 
-    {
-        name:
-            "Адмирал",
-        level: 94
-    },
+  function esc(v) {
+    return String(v ?? "")
+      .replaceAll("&","&amp;")
+      .replaceAll("<","&lt;")
+      .replaceAll(">","&gt;")
+      .replaceAll('"',"&quot;")
+      .replaceAll("'","&#039;");
+  }
 
-    {
-        name:
-            "Вице-адмирал",
-        level: 88
-    },
-
-    {
-        name:
-            "Контр-адмирал",
-        level: 83
-    },
-
-    {
-        name:
-            "Капитан флота",
-        level: 77
-    },
-
-    {
-        name:
-            "Коммандер флота",
-        level: 71
-    },
-
-    {
-        name:
-            "Лейтенант-коммандер",
-        level: 66
-    },
-
-    {
-        name:
-            "Лейтенант флота",
-        level: 60
-    },
-
-    {
-        name:
-            "Прапорщик",
-        level: 55
-    },
-
-    {
-        name:
-            "Сержант-майор воздушных войск",
-        level: 49
-    },
-
-    {
-        name:
-            "Команд-сержант-майор",
-        level: 43
-    },
-
-    {
-        name:
-            "Сержант-майор",
-        level: 38
-    },
-
-    {
-        name:
-            "Мастер сержант",
-        level: 32
-    },
-
-    {
-        name:
-            "Сержант первого класса",
-        level: 26
-    },
-
-    {
-        name:
-            "Сержант",
-        level: 21
-    },
-
-    {
-        name:
-            "Мичман",
-        level: 15
-    },
-
-    {
-        name:
-            "Специалист",
-        level: 10
-    }
-
-];
-
-
-const COMMAND_LEVELS =
-    [100, 94, 88, 83];
-
-
-/* =========================================================
-   STATE
-========================================================= */
-
-let currentUser =
-    null;
-
-let currentProfile =
-    null;
-
-let profiles =
-    [];
-
-let medals =
-    [];
-
-
-/* =========================================================
-   HELPERS
-========================================================= */
-
-function isCommand() {
-
+  function commandUser() {
     return currentProfile &&
-        COMMAND_LEVELS.includes(
-            Number(
-                currentProfile.level
-            )
-        );
+      COMMAND_LEVELS.has(Number(currentProfile.level));
+  }
 
-}
+  function toast(message,error=false) {
+    const el=$("toast");
+    el.textContent=message;
+    el.classList.toggle("toast-error",error);
+    el.classList.add("show");
+    setTimeout(()=>el.classList.remove("show"),3000);
+  }
 
+  function showPage(page) {
+    document.querySelectorAll(".page").forEach(x=>x.classList.add("hidden"));
+    $("page-"+page).classList.remove("hidden");
+    document.querySelectorAll(".nav").forEach(x=>x.classList.toggle("active",x.dataset.page===page));
+  }
 
-function escapeHtml(value) {
+  document.querySelectorAll(".nav").forEach(btn=>{
+    btn.addEventListener("click",()=>showPage(btn.dataset.page));
+  });
 
-    return String(
-        value ?? ""
-    )
+  async function loadProfile() {
+    const {data:auth,error:authError}=await fleetDb.auth.getUser();
+    if(authError || !auth?.user) return false;
 
-    .replaceAll(
-        "&",
-        "&amp;"
-    )
+    const {data,error}=await fleetDb
+      .from("profiles")
+      .select("*")
+      .eq("id",auth.user.id)
+      .single();
 
-    .replaceAll(
-        "<",
-        "&lt;"
-    )
-
-    .replaceAll(
-        ">",
-        "&gt;"
-    )
-
-    .replaceAll(
-        '"',
-        "&quot;"
-    )
-
-    .replaceAll(
-        "'",
-        "&#039;"
-    );
-
-}
-
-
-function showToast(
-    message,
-    error = false
-) {
-
-    const toast =
-        document.getElementById(
-            "toast"
-        );
-
-    toast.textContent =
-        message;
-
-    toast.classList.toggle(
-        "error",
-        error
-    );
-
-    toast.classList.add(
-        "show"
-    );
-
-    setTimeout(
-        () => {
-            toast.classList.remove(
-                "show"
-            );
-        },
-        3000
-    );
-
-}
-
-
-/* =========================================================
-   LOGIN
-========================================================= */
-
-async function login() {
-
-    const username =
-        document
-            .getElementById(
-                "loginUsername"
-            )
-            .value
-            .trim()
-            .toLowerCase();
-
-
-    const password =
-        document
-            .getElementById(
-                "loginPassword"
-            )
-            .value;
-
-
-    const errorBox =
-        document.getElementById(
-            "loginError"
-        );
-
-
-    errorBox.textContent =
-        "";
-
-
-    if (
-        !username ||
-        !password
-    ) {
-
-        errorBox.textContent =
-            "Введите имя пользователя и пароль.";
-
-        return;
-
+    if(error || !data) {
+      console.error("PROFILE ERROR",error);
+      return false;
     }
 
-
-    const email =
-        `${username}@fleet.local`;
-
-
-    const {
-        error
-    } =
-        await supabase.auth
-            .signInWithPassword({
-
-                email,
-
-                password
-
-            });
-
-
-    if (error) {
-
-        console.error(
-            "LOGIN ERROR:",
-            error
-        );
-
-        errorBox.textContent =
-            error.message;
-
-        return;
-    }
-
-
-    await initializeApp();
-
-}
-
-
-document
-    .getElementById(
-        "loginButton"
-    )
-    .addEventListener(
-        "click",
-        login
-    );
-
-
-document
-    .getElementById(
-        "loginPassword"
-    )
-    .addEventListener(
-        "keydown",
-        event => {
-
-            if (
-                event.key ===
-                "Enter"
-            ) {
-
-                login();
-
-            }
-
-        }
-    );
-
-
-/* =========================================================
-   LOGOUT
-========================================================= */
-
-document
-    .getElementById(
-        "logoutButton"
-    )
-    .addEventListener(
-        "click",
-        async () => {
-
-            await supabase.auth.signOut();
-
-            location.reload();
-
-        }
-    );
-
-
-/* =========================================================
-   GET CURRENT PROFILE
-========================================================= */
-
-async function loadCurrentProfile() {
-
-    const {
-        data: authData
-    } =
-        await supabase.auth
-            .getUser();
-
-
-    currentUser =
-        authData?.user ??
-        null;
-
-
-    if (!currentUser) {
-
-        return false;
-
-    }
-
-
-    const {
-        data,
-        error
-    } =
-        await supabase
-            .from("profiles")
-            .select("*")
-            .eq(
-                "id",
-                currentUser.id
-            )
-            .single();
-
-
-    if (error) {
-
-        console.error(
-            "PROFILE ERROR:",
-            error
-        );
-
-        return false;
-
-    }
-
-
-    currentProfile =
-        data;
-
-
+    currentProfile=data;
     return true;
+  }
 
-}
+  async function loadProfiles() {
+    const {data,error}=await fleetDb
+      .from("profiles")
+      .select("*")
+      .order("level",{ascending:false})
+      .order("number",{ascending:true});
 
+    if(error) {
+      console.error("PROFILES ERROR",error);
+      toast("Ошибка загрузки личного состава.",true);
+      return;
+    }
+    profiles=data || [];
+  }
 
-/* =========================================================
-   INITIALIZE
-========================================================= */
+  async function loadMedals() {
+    const {data,error}=await fleetDb
+      .from("medals")
+      .select("*, profiles!medals_user_id_fkey(username,rank_name)")
+      .order("created_at",{ascending:false});
 
-async function initializeApp() {
+    if(error) {
+      console.error("MEDALS ERROR",error);
+      return;
+    }
+    medals=data || [];
+  }
 
-    const ok =
-        await loadCurrentProfile();
+  function updateHeader() {
+    $("topUser").textContent=currentProfile.username || "—";
+    $("topRank").textContent=currentProfile.rank_name || "—";
+    $("profileNumber").value=currentProfile.number || "";
+    $("profileCallsign").value=currentProfile.callsign || "";
+    $("profileRank").value=currentProfile.rank_name || "";
+    $("statLevel").textContent=currentProfile.level || 0;
+  }
 
+  function renderRanks() {
+    $("rankList").innerHTML=RANKS.map(r=>{
+      const command=COMMAND_LEVELS.has(r.level);
+      return `<div class="rank-row">
+        <span>${esc(r.name)}</span>
+        <span style="color:${command ? "#ffd400":"#8494a8"}">
+          Уровень ${r.level}${command ? " • КОМАНДОВАНИЕ":""}
+        </span>
+      </div>`;
+    }).join("");
 
-    if (!ok) {
+    $("createRank").innerHTML =
+      `<option value="">Выберите звание</option>`+
+      RANKS.map(r=>`<option value="${esc(r.name)}">${esc(r.name)}</option>`).join("");
+  }
 
-        return;
+  function renderPersonnel(search="") {
+    const q=search.trim().toLowerCase();
 
+    const list=profiles.filter(p=>{
+      if(!q) return true;
+      return [
+        p.number,p.username,p.callsign,p.rank_name
+      ].some(v=>String(v??"").toLowerCase().includes(q));
+    });
+
+    $("personnelBody").innerHTML=list.map(p=>{
+      const command=COMMAND_LEVELS.has(Number(p.level));
+      const tech=p.subgroup==="TECHNICAL";
+      let action="—";
+
+      if(commandUser() &&
+         p.id!==currentProfile.id &&
+         Number(p.level)<Number(currentProfile.level)) {
+        action=`<button class="danger" data-delete="${esc(p.id)}">Удалить</button>`;
+      }
+
+      return `<tr>
+        <td>${esc(p.number)}</td>
+        <td><strong>${esc(p.username)}</strong></td>
+        <td>${esc(p.callsign)}</td>
+        <td>${esc(p.rank_name)}</td>
+        <td>${esc(p.level)}</td>
+        <td><span class="badge ${tech?"tech":command?"command":"personnel"}">
+          ${tech?"TECHNICAL":command?"COMMAND":"PERSONNEL"}
+        </span></td>
+        <td>${action}</td>
+      </tr>`;
+    }).join("");
+
+    document.querySelectorAll("[data-delete]").forEach(btn=>{
+      btn.addEventListener("click",()=>deleteAccount(btn.dataset.delete));
+    });
+  }
+
+  function renderMedalUsers() {
+    $("medalUser").innerHTML =
+      `<option value="">Выберите пользователя</option>`+
+      profiles.map(p=>`<option value="${esc(p.id)}">${esc(p.number)} — ${esc(p.username)} — ${esc(p.rank_name)}</option>`).join("");
+  }
+
+  function renderTechnicalUsers() {
+    const tech=profiles.filter(p=>p.subgroup==="TECHNICAL");
+    $("techUser").innerHTML =
+      `<option value="">Выберите технического работника</option>`+
+      tech.map(p=>`<option value="${esc(p.id)}">${esc(p.number)} — ${esc(p.username)}</option>`).join("");
+  }
+
+  function renderMedals() {
+    if(!medals.length) {
+      $("medalList").innerHTML=`<p class="muted">Наград пока нет.</p>`;
+      return;
     }
 
+    $("medalList").innerHTML=medals.map(m=>{
+      const p=m.profiles;
+      return `<div class="medal">
+        <strong>🏅 ${esc(m.name)}</strong>
+        <small>${p ? esc(p.username)+" • "+esc(p.rank_name):"Пользователь"}</small>
+        <div class="muted" style="margin-top:6px">${esc(m.description)}</div>
+      </div>`;
+    }).join("");
+  }
 
-    document
-        .getElementById(
-            "loginScreen"
-        )
-        .classList.add(
-            "hidden"
-        );
+  function updateStats() {
+    $("statUsers").textContent=profiles.length;
+    $("statTech").textContent=profiles.filter(p=>p.subgroup==="TECHNICAL").length;
+    $("statMedals").textContent=medals.length;
+  }
 
+  function updatePermissionUI() {
+    const yes=commandUser();
+    $("createPanel").classList.toggle("hidden",!yes);
+    $("createDenied").classList.toggle("hidden",yes);
+    $("medalPanel").classList.toggle("hidden",!yes);
+    $("medalDenied").classList.toggle("hidden",yes);
+    $("techPanel").classList.toggle("hidden",!yes);
+    $("techDenied").classList.toggle("hidden",yes);
+  }
 
-    document
-        .getElementById(
-            "app"
-        )
-        .classList.remove(
-            "hidden"
-        );
-
-
+  async function refreshAll() {
+    await loadProfiles();
+    await loadMedals();
     updateHeader();
+    renderPersonnel($("search").value);
+    renderMedalUsers();
+    renderTechnicalUsers();
+    renderMedals();
+    updateStats();
+  }
+
+  async function login() {
+    const username=$("loginUsername").value.trim().toLowerCase();
+    const password=$("loginPassword").value;
+    $("loginError").textContent="";
+
+    if(!username || !password) {
+      $("loginError").textContent="Введите имя пользователя и пароль.";
+      return;
+    }
+
+    const email=`${username}@fleet.local`;
+
+    const {error}=await fleetDb.auth.signInWithPassword({email,password});
+
+    if(error) {
+      console.error("LOGIN ERROR",error);
+      $("loginError").textContent=error.message;
+      return;
+    }
+
+    await boot();
+  }
+
+  async function boot() {
+    const ok=await loadProfile();
+
+    if(!ok) {
+      $("login").classList.remove("hidden");
+      $("app").classList.add("hidden");
+      return;
+    }
+
+    $("login").classList.add("hidden");
+    $("app").classList.remove("hidden");
 
     renderRanks();
-
-    updatePermissionsUI();
-
-    await loadAllData();
-
-}
-
-
-/* =========================================================
-   HEADER
-========================================================= */
-
-function updateHeader() {
-
-    document
-        .getElementById(
-            "topUsername"
-        )
-        .textContent =
-        currentProfile.username;
-
-
-    document
-        .getElementById(
-            "topRank"
-        )
-        .textContent =
-        currentProfile.rank_name;
-
-
-    document
-        .getElementById(
-            "profileNumber"
-        )
-        .value =
-        currentProfile.number ??
-        "";
-
-
-    document
-        .getElementById(
-            "profileCallsign"
-        )
-        .value =
-        currentProfile.callsign ??
-        "";
-
-
-    document
-        .getElementById(
-            "profileRank"
-        )
-        .value =
-        currentProfile.rank_name ??
-        "";
-
-
-    document
-        .getElementById(
-            "statLevel"
-        )
-        .textContent =
-        currentProfile.level ??
-        0;
-
-}
-
-
-/* =========================================================
-   LOAD DATA
-========================================================= */
-
-async function loadAllData() {
-
-    await loadProfiles();
-
-    await loadMedals();
-
-    renderPersonnel();
-
-    renderMedalUsers();
-
-    renderTechnicalUsers();
-
-    renderMedals();
-
-    updateStats();
-
-}
-
-
-/* =========================================================
-   LOAD PROFILES
-========================================================= */
-
-async function loadProfiles() {
-
-    const {
-        data,
-        error
-    } =
-        await supabase
-            .from("profiles")
-            .select("*")
-            .order(
-                "level",
-                {
-                    ascending: false
-                }
-            )
-            .order(
-                "number",
-                {
-                    ascending: true
-                }
-            );
-
-
-    if (error) {
-
-        console.error(
-            "PROFILES ERROR:",
-            error
-        );
-
-        showToast(
-            "Не удалось загрузить личный состав.",
-            true
-        );
-
-        return;
-
-    }
-
-
-    profiles =
-        data ?? [];
-
-}
-
-
-/* =========================================================
-   LOAD MEDALS
-========================================================= */
-
-async function loadMedals() {
-
-    const {
-        data,
-        error
-    } =
-        await supabase
-            .from("medals")
-            .select(
-                "*, profiles(username,rank_name)"
-            )
-            .order(
-                "created_at",
-                {
-                    ascending: false
-                }
-            );
-
-
-    if (error) {
-
-        console.error(
-            "MEDALS ERROR:",
-            error
-        );
-
-        return;
-
-    }
-
-
-    medals =
-        data ?? [];
-
-}
-
-
-/* =========================================================
-   STATS
-========================================================= */
-
-function updateStats() {
-
-    const tech =
-        profiles.filter(
-            p =>
-                p.subgroup ===
-                "TECHNICAL"
-        ).length;
-
-
-    document
-        .getElementById(
-            "statUsers"
-        )
-        .textContent =
-        profiles.length;
-
-
-    document
-        .getElementById(
-            "statTech"
-        )
-        .textContent =
-        tech;
-
-
-    document
-        .getElementById(
-            "statMedals"
-        )
-        .textContent =
-        medals.length;
-
-}
-
-
-/* =========================================================
-   RANK LIST
-========================================================= */
-
-function renderRanks() {
-
-    const box =
-        document.getElementById(
-            "rankList"
-        );
-
-
-    box.innerHTML =
-        RANKS
-            .map(
-                rank => {
-
-                    const command =
-                        COMMAND_LEVELS
-                            .includes(
-                                rank.level
-                            );
-
-
-                    return `
-
-                    <div
-                        style="
-                            display:flex;
-                            justify-content:space-between;
-                            padding:12px 0;
-                            border-bottom:1px solid #1c2937;
-                        "
-                    >
-
-                        <span>
-                            ${escapeHtml(
-                                rank.name
-                            )}
-                        </span>
-
-                        <span
-                            style="
-                                color:${
-                                    command
-                                        ? "#ffd400"
-                                        : "#8191a5"
-                                };
-                            "
-                        >
-                            Уровень ${rank.level}
-                            ${
-                                command
-                                    ? " • КОМАНДОВАНИЕ"
-                                    : ""
-                            }
-                        </span>
-
-                    </div>
-
-                    `;
-
-                }
-            )
-            .join("");
-
-}
-
-
-/* =========================================================
-   PERSONNEL TABLE
-========================================================= */
-
-function renderPersonnel(
-    search = ""
-) {
-
-    const tbody =
-        document.getElementById(
-            "personnelTable"
-        );
-
-
-    const query =
-        search
-            .trim()
-            .toLowerCase();
-
-
-    const filtered =
-        profiles.filter(
-            p => {
-
-                if (!query) {
-
-                    return true;
-
-                }
-
-
-                return (
-
-                    String(
-                        p.number
-                    )
-                    .toLowerCase()
-                    .includes(query)
-
-                    ||
-
-                    String(
-                        p.username
-                    )
-                    .toLowerCase()
-                    .includes(query)
-
-                    ||
-
-                    String(
-                        p.callsign
-                    )
-                    .toLowerCase()
-                    .includes(query)
-
-                    ||
-
-                    String(
-                        p.rank_name
-                    )
-                    .toLowerCase()
-                    .includes(query)
-
-                );
-
-            }
-        );
-
-
-    tbody.innerHTML =
-        filtered
-            .map(
-                p => {
-
-                    const command =
-                        COMMAND_LEVELS
-                            .includes(
-                                Number(
-                                    p.level
-                                )
-                            );
-
-
-                    const subgroup =
-                        p.subgroup ===
-                        "TECHNICAL";
-
-
-                    let actions =
-                        "—";
-
-
-                    if (
-                        isCommand() &&
-                        p.id !==
-                            currentProfile.id &&
-                        Number(p.level) <
-                            Number(
-                                currentProfile.level
-                            )
-                    ) {
-
-                        actions = `
-
-                            <button
-                                class="dangerButton"
-                                onclick="deleteAccount('${p.id}')"
-                            >
-                                Удалить
-                            </button>
-
-                        `;
-
-                    }
-
-
-                    return `
-
-                    <tr>
-
-                        <td>
-                            ${escapeHtml(
-                                p.number
-                            )}
-                        </td>
-
-                        <td>
-                            <strong>
-                                ${escapeHtml(
-                                    p.username
-                                )}
-                            </strong>
-                        </td>
-
-                        <td>
-                            ${escapeHtml(
-                                p.callsign
-                            )}
-                        </td>
-
-                        <td>
-                            ${escapeHtml(
-                                p.rank_name
-                            )}
-                        </td>
-
-                        <td>
-                            ${p.level}
-                        </td>
-
-                        <td>
-
-                            <span
-                                class="badge ${
-                                    subgroup
-                                        ? "tech"
-                                        : command
-                                            ? "command"
-                                            : "personnel"
-                                }"
-                            >
-
-                                ${
-                                    subgroup
-                                        ? "TECHNICAL"
-                                        : command
-                                            ? "COMMAND"
-                                            : "PERSONNEL"
-                                }
-
-                            </span>
-
-                        </td>
-
-                        <td>
-                            ${actions}
-                        </td>
-
-                    </tr>
-
-                    `;
-
-                }
-            )
-            .join("");
-
-}
-
-
-/* =========================================================
-   SEARCH
-========================================================= */
-
-document
-    .getElementById(
-        "searchPersonnel"
-    )
-    .addEventListener(
-        "input",
-        event => {
-
-            renderPersonnel(
-                event.target.value
-            );
-
-        }
-    );
-
-
-/* =========================================================
-   DELETE
-========================================================= */
-
-async function deleteAccount(
-    userId
-) {
-
-    const target =
-        profiles.find(
-            p =>
-                p.id === userId
-        );
-
-
-    if (!target) {
-
-        return;
-
-    }
-
-
-    if (
-        !confirm(
-            `Удалить аккаунт ${target.username}?`
-        )
-    ) {
-
-        return;
-
-    }
-
-
-    const {
-        data,
-        error
-    } =
-        await supabase.functions
-            .invoke(
-                "admin-users",
-                {
-                    body: {
-
-                        action:
-                            "delete",
-
-                        user_id:
-                            userId
-
-                    }
-                }
-            );
-
-
-    if (error) {
-
-        console.error(
-            "DELETE ERROR:",
-            error
-        );
-
-        showToast(
-            error.message,
-            true
-        );
-
-        return;
-
-    }
-
-
-    if (!data?.ok) {
-
-        showToast(
-            data?.error ??
-                "Не удалось удалить аккаунт.",
-            true
-        );
-
-        return;
-
-    }
-
-
-    showToast(
-        "Аккаунт удалён."
-    );
-
-
-    await loadAllData();
-
-}
-
-
-/* =========================================================
-   CREATE RANK SELECT
-========================================================= */
-
-function fillCreateRanks() {
-
-    const select =
-        document.getElementById(
-            "createRank"
-        );
-
-
-    select.innerHTML = `
-
-        <option value="">
-            Выберите звание
-        </option>
-
-    `;
-
-
-    RANKS.forEach(
-        rank => {
-
-            const option =
-                document.createElement(
-                    "option"
-                );
-
-
-            option.value =
-                rank.name;
-
-
-            option.textContent =
-                rank.name;
-
-
-            select.appendChild(
-                option
-            );
-
-        }
-    );
-
-}
-
-
-/* =========================================================
-   SUBGROUP
-========================================================= */
-
-document
-    .getElementById(
-        "createSubgroup"
-    )
-    .addEventListener(
-        "change",
-        event => {
-
-            document
-                .getElementById(
-                    "createTechPermissions"
-                )
-                .classList.toggle(
-                    "hidden",
-                    event.target.value !==
-                        "TECHNICAL"
-                );
-
-        }
-    );
-
-
-/* =========================================================
-   CREATE ACCOUNT
-========================================================= */
-
-async function createAccount() {
-
-    if (!isCommand()) {
-
-        showToast(
-            "Недостаточно прав.",
-            true
-        );
-
-        return;
-
-    }
-
-
-    const number =
-        document
-            .getElementById(
-                "createNumber"
-            )
-            .value
-            .trim();
-
-
-    const username =
-        document
-            .getElementById(
-                "createUsername"
-            )
-            .value
-            .trim();
-
-
-    const callsign =
-        document
-            .getElementById(
-                "createCallsign"
-            )
-            .value
-            .trim();
-
-
-    const password =
-        document
-            .getElementById(
-                "createPassword"
-            )
-            .value;
-
-
-    const rank_name =
-        document
-            .getElementById(
-                "createRank"
-            )
-            .value;
-
-
-    const subgroup =
-        document
-            .getElementById(
-                "createSubgroup"
-            )
-            .value;
-
-
-    const tech_permissions = {
-
-        view_profiles:
-            document
-                .getElementById(
-                    "createViewProfiles"
-                )
-                .checked,
-
-        edit_profile:
-            document
-                .getElementById(
-                    "createEditProfile"
-                )
-                .checked,
-
-        view_audit:
-            document
-                .getElementById(
-                    "createViewAudit"
-                )
-                .checked,
-
-        technical_settings:
-            document
-                .getElementById(
-                    "createTechnicalSettings"
-                )
-                .checked
-
+    updateHeader();
+    updatePermissionUI();
+    await refreshAll();
+  }
+
+  async function createAccount() {
+    if(!commandUser()) return toast("Недостаточно прав.",true);
+
+    const body={
+      action:"create",
+      number:$("createNumber").value.trim(),
+      username:$("createUsername").value.trim(),
+      callsign:$("createCallsign").value.trim(),
+      password:$("createPassword").value,
+      rank_name:$("createRank").value,
+      subgroup:$("createSubgroup").value,
+      tech_permissions:{
+        view_profiles:$("cViewProfiles").checked,
+        edit_profile:$("cEditProfile").checked,
+        view_audit:$("cViewAudit").checked,
+        technical_settings:$("cTechnicalSettings").checked
+      }
     };
 
-
-    if (
-        !number ||
-        !username ||
-        !callsign ||
-        !password ||
-        !rank_name
-    ) {
-
-        showToast(
-            "Заполните все поля.",
-            true
-        );
-
-        return;
-
+    if(!body.number || !body.username || !body.callsign || !body.password || !body.rank_name) {
+      return toast("Заполните все поля.",true);
     }
 
+    const {data,error}=await fleetDb.functions.invoke("admin-users",{body});
 
-    const {
-        data,
-        error
-    } =
-        await supabase.functions
-            .invoke(
-                "admin-users",
-                {
-
-                    body: {
-
-                        action:
-                            "create",
-
-                        number,
-
-                        username,
-
-                        callsign,
-
-                        password,
-
-                        rank_name,
-
-                        subgroup,
-
-                        tech_permissions
-
-                    }
-
-                }
-            );
-
-
-    if (error) {
-
-        console.error(
-            "CREATE ERROR:",
-            error
-        );
-
-        showToast(
-            error.message,
-            true
-        );
-
-        return;
-
+    if(error) {
+      console.error("CREATE FUNCTION ERROR",error);
+      return toast(error.message || "Ошибка Edge Function.",true);
     }
 
+    if(!data?.ok) return toast(data?.error || "Ошибка создания аккаунта.",true);
 
-    if (!data?.ok) {
+    toast("Аккаунт успешно создан.");
 
-        showToast(
-            data?.error ??
-                "Ошибка создания.",
-            true
-        );
+    ["createNumber","createUsername","createCallsign","createPassword"].forEach(id=>$(id).value="");
+    $("createRank").value="";
+    await refreshAll();
+  }
 
-        return;
+  async function deleteAccount(id) {
+    const target=profiles.find(p=>p.id===id);
+    if(!target) return;
 
+    if(!confirm(`Удалить аккаунт ${target.username}?`)) return;
+
+    const {data,error}=await fleetDb.functions.invoke("admin-users",{
+      body:{action:"delete",user_id:id}
+    });
+
+    if(error) {
+      console.error("DELETE FUNCTION ERROR",error);
+      return toast(error.message || "Ошибка Edge Function.",true);
     }
 
-
-    showToast(
-        "Аккаунт успешно создан."
-    );
-
-
-    document
-        .getElementById(
-            "createNumber"
-        )
-        .value = "";
-
-
-    document
-        .getElementById(
-            "createUsername"
-        )
-        .value = "";
-
-
-    document
-        .getElementById(
-            "createCallsign"
-        )
-        .value = "";
-
-
-    document
-        .getElementById(
-            "createPassword"
-        )
-        .value = "";
-
-
-    document
-        .getElementById(
-            "createRank"
-        )
-        .value = "";
-
-
-    await loadAllData();
-
-}
-
-
-/* =========================================================
-   CREATE BUTTON
-========================================================= */
-
-document
-    .getElementById(
-        "createButton"
-    )
-    .addEventListener(
-        "click",
-        createAccount
-    );
-
-
-/* =========================================================
-   MEDAL USERS
-========================================================= */
-
-function renderMedalUsers() {
-
-    const select =
-        document.getElementById(
-            "medalUser"
-        );
-
-
-    select.innerHTML =
-        `<option value="">
-            Выберите пользователя
-        </option>`;
-
-
-    profiles.forEach(
-        p => {
-
-            const option =
-                document.createElement(
-                    "option"
-                );
-
-
-            option.value =
-                p.id;
-
-
-            option.textContent =
-                `${p.number} — ${p.username} — ${p.rank_name}`;
-
-
-            select.appendChild(
-                option
-            );
-
-        }
-    );
-
-}
-
-
-/* =========================================================
-   AWARD MEDAL
-========================================================= */
-
-async function awardMedal() {
-
-    if (!isCommand()) {
-
-        showToast(
-            "Недостаточно прав.",
-            true
-        );
-
-        return;
-
-    }
-
-
-    const user_id =
-        document
-            .getElementById(
-                "medalUser"
-            )
-            .value;
-
-
-    const medal_name =
-        document
-            .getElementById(
-                "medalName"
-            )
-            .value
-            .trim();
-
-
-    const description =
-        document
-            .getElementById(
-                "medalDescription"
-            )
-            .value
-            .trim();
-
-
-    if (
-        !user_id ||
-        !medal_name
-    ) {
-
-        showToast(
-            "Выберите пользователя и укажите название награды.",
-            true
-        );
-
-        return;
-
-    }
-
-
-    const {
-        data,
-        error
-    } =
-        await supabase.functions
-            .invoke(
-                "admin-users",
-                {
-
-                    body: {
-
-                        action:
-                            "award_medal",
-
-                        user_id,
-
-                        medal_name,
-
-                        description
-
-                    }
-
-                }
-            );
-
-
-    if (error) {
-
-        console.error(
-            "MEDAL ERROR:",
-            error
-        );
-
-        showToast(
-            error.message,
-            true
-        );
-
-        return;
-
-    }
-
-
-    if (!data?.ok) {
-
-        showToast(
-            data?.error ??
-                "Ошибка выдачи награды.",
-            true
-        );
-
-        return;
-
-    }
-
-
-    showToast(
-        "Награда выдана."
-    );
-
-
-    document
-        .getElementById(
-            "medalName"
-        )
-        .value = "";
-
-
-    document
-        .getElementById(
-            "medalDescription"
-        )
-        .value = "";
-
-
-    await loadAllData();
-
-}
-
-
-/* =========================================================
-   MEDAL BUTTON
-========================================================= */
-
-document
-    .getElementById(
-        "awardButton"
-    )
-    .addEventListener(
-        "click",
-        awardMedal
-    );
-
-
-/* =========================================================
-   RENDER MEDALS
-========================================================= */
-
-function renderMedals() {
-
-    const box =
-        document.getElementById(
-            "medalList"
-        );
-
-
-    if (!medals.length) {
-
-        box.innerHTML =
-            `
-            <p style="color:#8191a5">
-                Наград пока нет.
-            </p>
-            `;
-
-        return;
-
-    }
-
-
-    box.innerHTML =
-        medals
-            .map(
-                medal => {
-
-                    const profile =
-                        medal.profiles;
-
-
-                    return `
-
-                    <div class="medal">
-
-                        <div class="medalName">
-
-                            🏅
-                            ${escapeHtml(
-                                medal.name
-                            )}
-
-                        </div>
-
-                        <div
-                            style="
-                                color:#aebbd0;
-                                margin-top:5px;
-                            "
-                        >
-
-                            ${
-                                profile
-                                    ? escapeHtml(
-                                        profile.username
-                                    )
-                                    : "Неизвестный пользователь"
-                            }
-
-                            ${
-                                profile
-                                    ? ` • ${escapeHtml(
-                                        profile.rank_name
-                                    )}`
-                                    : ""
-                            }
-
-                        </div>
-
-                        <div class="medalDescription">
-
-                            ${escapeHtml(
-                                medal.description
-                            )}
-
-                        </div>
-
-                    </div>
-
-                    `;
-
-                }
-            )
-            .join("");
-
-}
-
-
-/* =========================================================
-   TECH USERS
-========================================================= */
-
-function renderTechnicalUsers() {
-
-    const select =
-        document.getElementById(
-            "technicalUser"
-        );
-
-
-    select.innerHTML =
-        `
-        <option value="">
-            Выберите технического работника
-        </option>
-        `;
-
-
-    profiles
-
-        .filter(
-            p =>
-                p.subgroup ===
-                "TECHNICAL"
-        )
-
-        .forEach(
-            p => {
-
-                const option =
-                    document.createElement(
-                        "option"
-                    );
-
-
-                option.value =
-                    p.id;
-
-
-                option.textContent =
-                    `${p.number} — ${p.username}`;
-
-
-                select.appendChild(
-                    option
-                );
-
-            }
-        );
-
-}
-
-
-/* =========================================================
-   TECH USER CHANGE
-========================================================= */
-
-document
-    .getElementById(
-        "technicalUser"
-    )
-    .addEventListener(
-        "change",
-        event => {
-
-            const user =
-                profiles.find(
-                    p =>
-                        p.id ===
-                        event.target.value
-                );
-
-
-            if (!user) {
-
-                return;
-
-            }
-
-
-            const permissions =
-                user.tech_permissions ??
-                {};
-
-
-            document
-                .getElementById(
-                    "techViewProfiles"
-                )
-                .checked =
-                permissions.view_profiles === true;
-
-
-            document
-                .getElementById(
-                    "techEditProfile"
-                )
-                .checked =
-                permissions.edit_profile === true;
-
-
-            document
-                .getElementById(
-                    "techViewAudit"
-                )
-                .checked =
-                permissions.view_audit === true;
-
-
-            document
-                .getElementById(
-                    "techTechnicalSettings"
-                )
-                .checked =
-                permissions.technical_settings === true;
-
-        }
-    );
-
-
-/* =========================================================
-   SAVE TECH PERMISSIONS
-========================================================= */
-
-async function saveTechPermissions() {
-
-    if (!isCommand()) {
-
-        showToast(
-            "Недостаточно прав.",
-            true
-        );
-
-        return;
-
-    }
-
-
-    const user_id =
-        document
-            .getElementById(
-                "technicalUser"
-            )
-            .value;
-
-
-    if (!user_id) {
-
-        showToast(
-            "Выберите технического работника.",
-            true
-        );
-
-        return;
-
-    }
-
-
-    const tech_permissions = {
-
-        view_profiles:
-            document
-                .getElementById(
-                    "techViewProfiles"
-                )
-                .checked,
-
-        edit_profile:
-            document
-                .getElementById(
-                    "techEditProfile"
-                )
-                .checked,
-
-        view_audit:
-            document
-                .getElementById(
-                    "techViewAudit"
-                )
-                .checked,
-
-        technical_settings:
-            document
-                .getElementById(
-                    "techTechnicalSettings"
-                )
-                .checked
-
+    if(!data?.ok) return toast(data?.error || "Удаление запрещено.",true);
+
+    toast("Аккаунт удалён.");
+    await refreshAll();
+  }
+
+  async function awardMedal() {
+    if(!commandUser()) return toast("Недостаточно прав.",true);
+
+    const body={
+      action:"award_medal",
+      user_id:$("medalUser").value,
+      medal_name:$("medalName").value.trim(),
+      description:$("medalDescription").value.trim()
     };
 
-
-    const {
-        data,
-        error
-    } =
-        await supabase.functions
-            .invoke(
-                "admin-users",
-                {
-
-                    body: {
-
-                        action:
-                            "set_tech_permissions",
-
-                        user_id,
-
-                        tech_permissions
-
-                    }
-
-                }
-            );
-
-
-    if (error) {
-
-        showToast(
-            error.message,
-            true
-        );
-
-        return;
-
+    if(!body.user_id || !body.medal_name) {
+      return toast("Выберите пользователя и укажите название награды.",true);
     }
 
+    const {data,error}=await fleetDb.functions.invoke("admin-users",{body});
 
-    if (!data?.ok) {
-
-        showToast(
-            data?.error ??
-                "Ошибка.",
-            true
-        );
-
-        return;
-
+    if(error) {
+      console.error("MEDAL FUNCTION ERROR",error);
+      return toast(error.message || "Ошибка Edge Function.",true);
     }
 
-
-    showToast(
-        "Технические права сохранены."
-    );
-
-
-    await loadAllData();
-
-}
-
-
-/* =========================================================
-   TECH BUTTON
-========================================================= */
-
-document
-    .getElementById(
-        "saveTechButton"
-    )
-    .addEventListener(
-        "click",
-        saveTechPermissions
-    );
-
-
-/* =========================================================
-   UI PERMISSIONS
-========================================================= */
-
-function updatePermissionsUI() {
-
-    const command =
-        isCommand();
-
-
-    document
-        .getElementById(
-            "createPanel"
-        )
-        .classList.toggle(
-            "hidden",
-            !command
-        );
-
-
-    document
-        .getElementById(
-            "createDenied"
-        )
-        .classList.toggle(
-            "hidden",
-            command
-        );
-
-
-    document
-        .getElementById(
-            "medalPanel"
-        )
-        .classList.toggle(
-            "hidden",
-            !command
-        );
-
-
-    document
-        .getElementById(
-            "medalDenied"
-        )
-        .classList.toggle(
-            "hidden",
-            command
-        );
-
-
-    document
-        .getElementById(
-            "technicalPanel"
-        )
-        .classList.toggle(
-            "hidden",
-            !command
-        );
-
-
-    document
-        .getElementById(
-            "technicalDenied"
-        )
-        .classList.toggle(
-            "hidden",
-            command
-        );
-
-}
-
-
-/* =========================================================
-   NAVIGATION
-========================================================= */
-
-document
-    .querySelectorAll(
-        ".navButton"
-    )
-    .forEach(
-        button => {
-
-            button.addEventListener(
-                "click",
-                () => {
-
-                    const section =
-                        button.dataset
-                            .section;
-
-
-                    document
-                        .querySelectorAll(
-                            ".navButton"
-                        )
-                        .forEach(
-                            b =>
-                                b.classList.remove(
-                                    "active"
-                                )
-                        );
-
-
-                    button.classList.add(
-                        "active"
-                    );
-
-
-                    document
-                        .querySelectorAll(
-                            ".pageSection"
-                        )
-                        .forEach(
-                            s =>
-                                s.classList.add(
-                                    "hidden"
-                                )
-                        );
-
-
-                    document
-                        .getElementById(
-                            `section-${section}`
-                        )
-                        .classList.remove(
-                            "hidden"
-                        );
-
-                }
-            );
-
-        }
-    );
-
-
-/* =========================================================
-   REFRESH
-========================================================= */
-
-document
-    .getElementById(
-        "refreshButton"
-    )
-    .addEventListener(
-        "click",
-        async () => {
-
-            await loadAllData();
-
-            showToast(
-                "Данные обновлены."
-            );
-
-        }
-    );
-
-
-/* =========================================================
-   AUTH STATE
-========================================================= */
-
-supabase.auth
-    .onAuthStateChange(
-        async (
-            event,
-            session
-        ) => {
-
-            console.log(
-                "Auth state:",
-                event
-            );
-
-
-            if (
-                session &&
-                !currentProfile
-            ) {
-
-                await initializeApp();
-
-            }
-
-        }
-    );
-
-
-/* =========================================================
-   START
-========================================================= */
-
-(async function () {
-
-    fillCreateRanks();
-
-
-    const {
-        data
-    } =
-        await supabase.auth
-            .getSession();
-
-
-    if (
-        data?.session
-    ) {
-
-        await initializeApp();
-
+    if(!data?.ok) return toast(data?.error || "Награда не выдана.",true);
+
+    toast("Награда выдана.");
+    $("medalName").value="";
+    $("medalDescription").value="";
+    await refreshAll();
+  }
+
+  async function saveTechPermissions() {
+    if(!commandUser()) return toast("Недостаточно прав.",true);
+
+    const id=$("techUser").value;
+    if(!id) return toast("Выберите технического работника.",true);
+
+    const permissions={
+      view_profiles:$("tViewProfiles").checked,
+      edit_profile:$("tEditProfile").checked,
+      view_audit:$("tViewAudit").checked,
+      technical_settings:$("tTechnicalSettings").checked
+    };
+
+    const {data,error}=await fleetDb.functions.invoke("admin-users",{
+      body:{
+        action:"set_tech_permissions",
+        user_id:id,
+        tech_permissions:permissions
+      }
+    });
+
+    if(error) {
+      console.error("TECH FUNCTION ERROR",error);
+      return toast(error.message || "Ошибка Edge Function.",true);
     }
 
+    if(!data?.ok) return toast(data?.error || "Права не сохранены.",true);
+
+    toast("Права сохранены.");
+    await refreshAll();
+  }
+
+  $("loginBtn").addEventListener("click",login);
+  $("loginPassword").addEventListener("keydown",e=>{if(e.key==="Enter")login();});
+  $("logoutBtn").addEventListener("click",async()=>{
+    await fleetDb.auth.signOut();
+    location.reload();
+  });
+  $("refreshBtn").addEventListener("click",async()=>{await refreshAll();toast("Данные обновлены.");});
+  $("search").addEventListener("input",e=>renderPersonnel(e.target.value));
+  $("createBtn").addEventListener("click",createAccount);
+  $("awardBtn").addEventListener("click",awardMedal);
+  $("saveTechBtn").addEventListener("click",saveTechPermissions);
+
+  $("createSubgroup").addEventListener("change",e=>{
+    $("createTechBox").classList.toggle("hidden",e.target.value!=="TECHNICAL");
+  });
+
+  $("techUser").addEventListener("change",()=>{
+    const p=profiles.find(x=>x.id===$("techUser").value);
+    const perms=p?.tech_permissions || {};
+    $("tViewProfiles").checked=perms.view_profiles===true;
+    $("tEditProfile").checked=perms.edit_profile===true;
+    $("tViewAudit").checked=perms.view_audit===true;
+    $("tTechnicalSettings").checked=perms.technical_settings===true;
+  });
+
+  fleetDb.auth.onAuthStateChange((event,session)=>{
+    console.log("Fleet Auth:",event);
+    if(event==="SIGNED_OUT") {
+      $("login").classList.remove("hidden");
+      $("app").classList.add("hidden");
+    }
+  });
+
+  boot();
 })();
-
 </script>
-
 </body>
-
 </html>
